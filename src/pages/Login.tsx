@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import GlassCard from '@/components/ui-custom/glass-card';
 import PageTransition from '@/components/ui-custom/page-transition';
-import { toast } from '@/components/ui/sonner';
+import { toast } from '@/hooks/use-toast';
 import { Heart, Loader2 } from 'lucide-react';
 
 const Login: React.FC = () => {
