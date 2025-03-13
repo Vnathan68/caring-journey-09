@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Send, User } from 'lucide-react';
+import { Search, Send, User, Calendar, FileText, Heart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock data for messages
@@ -14,7 +14,7 @@ const mockContacts = [
     name: 'Dr. Maria Santos',
     role: 'OB-GYN Specialist',
     avatar: '/doctors/doctor1.jpg',
-    lastMessage: 'Your test results look good. Let's discuss at your next appointment.',
+    lastMessage: "Your test results look good. Let's discuss at your next appointment.",
     lastMessageTime: '2 hours ago',
     unread: true,
   },
@@ -42,28 +42,28 @@ const mockMessages = [
   {
     id: 'msg-1',
     senderId: 'contact-1',
-    content: 'Good morning! I've reviewed your latest lab work.',
+    content: "Good morning! I've reviewed your latest lab work.",
     timestamp: '9:30 AM',
     isFromContact: true,
   },
   {
     id: 'msg-2',
     senderId: 'contact-1',
-    content: 'Your iron levels are slightly low. I'd recommend increasing your intake of iron-rich foods or considering a supplement.',
+    content: "Your iron levels are slightly low. I'd recommend increasing your intake of iron-rich foods or considering a supplement.",
     timestamp: '9:32 AM',
     isFromContact: true,
   },
   {
     id: 'msg-3',
     senderId: 'user',
-    content: 'Thank you, Doctor. I'll make sure to adjust my diet. Should I be concerned about this?',
+    content: "Thank you, Doctor. I'll make sure to adjust my diet. Should I be concerned about this?",
     timestamp: '9:45 AM',
     isFromContact: false,
   },
   {
     id: 'msg-4',
     senderId: 'contact-1',
-    content: 'No need for concern. It's quite common during pregnancy. We'll monitor it at your next visit. Just make those dietary adjustments we discussed.',
+    content: "No need for concern. It's quite common during pregnancy. We'll monitor it at your next visit. Just make those dietary adjustments we discussed.",
     timestamp: '10:00 AM',
     isFromContact: true,
   },
@@ -84,7 +84,7 @@ const mockMessages = [
   {
     id: 'msg-7',
     senderId: 'contact-1',
-    content: 'Your test results look good. Let's discuss at your next appointment.',
+    content: "Your test results look good. Let's discuss at your next appointment.",
     timestamp: '2:45 PM',
     isFromContact: true,
   },
