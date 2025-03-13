@@ -25,6 +25,8 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     // Close menu when route changes
     setIsMenuOpen(false);
+    // Close services dropdown when route changes
+    setIsServicesOpen(false);
   }, [location.pathname]);
 
   const navLinks = [
@@ -71,6 +73,7 @@ const Navbar: React.FC = () => {
                         <Link
                           to={service.path}
                           className="flex items-center px-4 py-3 text-sm hover:bg-clinic-50 dark:hover:bg-slate-800 transition-colors"
+                          onClick={() => setIsServicesOpen(false)}
                         >
                           <service.icon className="h-4 w-4 mr-2 text-clinic-500" />
                           <span>{service.name}</span>
