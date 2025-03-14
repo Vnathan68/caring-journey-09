@@ -8,19 +8,19 @@ const CTASection: React.FC = () => {
   const { isAuthenticated } = useAuth();
   
   return (
-    <section className="py-20 bg-gradient-to-r from-clinic-600 to-clinic-500 text-white">
+    <section className="py-24 bg-gradient-to-r from-clinic-600 to-clinic-500 text-white">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="mb-8 md:mb-0 md:mr-8">
-            <h2 className="text-3xl font-bold mb-4">Ready to Book Your Appointment?</h2>
-            <p className="text-white/80 max-w-lg">
+          <div className="mb-10 md:mb-0 md:mr-10">
+            <h2 className="text-3xl font-bold mb-6">Ready to Book Your Appointment?</h2>
+            <p className="text-white/90 max-w-lg text-lg leading-relaxed">
               Schedule a consultation with our expert doctors today. We're committed to providing you with personalized care.
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-5">
             <Button 
               size="lg" 
-              className="bg-white text-clinic-600 hover:bg-white/90"
+              className="bg-white text-clinic-600 hover:bg-white/90 shadow-md hover:shadow-lg transition-all"
               asChild
             >
               <Link to={isAuthenticated ? "/dashboard/appointments" : "/signup"}>

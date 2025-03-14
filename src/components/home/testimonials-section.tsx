@@ -32,28 +32,28 @@ const TestimonialsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-slate-900">
+    <section className="py-24 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold mb-4">What Our Patients Say</h2>
-          <p className="text-muted-foreground">
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <h2 className="text-3xl font-bold mb-6">What Our Patients Say</h2>
+          <p className="text-muted-foreground text-lg">
             Hear from the women and families who have experienced our care
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-10">
           {testimonials.map((testimonial, index) => (
             <GlassCard 
               key={index} 
-              className={`p-8 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              className={`p-10 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ transitionDelay: `${index * 100}ms`, transition: 'all 0.5s ease-out' }}
             >
-              <div className="mb-6">
+              <div className="mb-8">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-yellow-400">★</span>
+                  <span key={i} className="text-yellow-400 text-xl">★</span>
                 ))}
               </div>
-              <p className="text-foreground mb-6 italic">"{testimonial.quote}"</p>
+              <p className="text-foreground mb-8 italic text-lg leading-relaxed">"{testimonial.quote}"</p>
               <div>
                 <p className="font-semibold">{testimonial.author}</p>
                 <p className="text-sm text-muted-foreground">{testimonial.role}</p>

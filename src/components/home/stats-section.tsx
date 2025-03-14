@@ -21,19 +21,19 @@ const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-clinic-50 dark:bg-slate-800">
+    <section className="py-24 bg-clinic-50 dark:bg-slate-800">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {stats.map((stat, index) => (
             <div 
               key={index} 
               className={`text-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ transitionDelay: `${index * 100}ms`, transition: 'all 0.5s ease-out' }}
             >
-              <h3 className="text-4xl md:text-5xl font-bold text-clinic-600 mb-2">
+              <h3 className="text-4xl md:text-5xl font-bold text-clinic-600 mb-4">
                 <AnimatedCounter value={stat.value} formatter={(val) => val.toLocaleString()} />+
               </h3>
-              <p className="text-muted-foreground">{stat.label}</p>
+              <p className="text-muted-foreground text-lg">{stat.label}</p>
             </div>
           ))}
         </div>

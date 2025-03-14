@@ -37,28 +37,28 @@ const ServicesSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-slate-900">
+    <section className="py-24 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold mb-4">Our Services</h2>
-          <p className="text-muted-foreground">
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <h2 className="text-3xl font-bold mb-6">Our Services</h2>
+          <p className="text-muted-foreground text-lg">
             Comprehensive women's healthcare services delivered with compassion and expertise
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-10">
           {services.map((service, index) => (
             <GlassCard 
               key={index} 
               interactive
-              className={`p-8 transform transition-all duration-300 hover:translate-y-[-5px] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} 
+              className={`p-10 transform transition-all duration-300 hover:translate-y-[-5px] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} 
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="inline-flex items-center justify-center p-3 bg-clinic-50 dark:bg-slate-800 text-clinic-600 rounded-xl mb-6">
-                <service.icon className="h-6 w-6" />
+              <div className="inline-flex items-center justify-center p-4 bg-clinic-50 dark:bg-slate-800 text-clinic-600 rounded-xl mb-7">
+                <service.icon className="h-7 w-7" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-              <p className="text-muted-foreground mb-6">{service.description}</p>
+              <h3 className="text-xl font-semibold mb-4">{service.title}</h3>
+              <p className="text-muted-foreground mb-8">{service.description}</p>
               <Link 
                 to={service.href}
                 className="inline-flex items-center text-clinic-600 hover:text-clinic-700 font-medium"
