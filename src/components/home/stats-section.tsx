@@ -24,7 +24,7 @@ const StatsSection: React.FC = () => {
 
     return () => {
       if (sectionRef.current) {
-        observer.disconnect();
+        observer.unobserve(sectionRef.current);
       }
     };
   }, []);
@@ -77,7 +77,7 @@ const StatsSection: React.FC = () => {
                 </span>
               </div>
               <h3 className="text-3xl md:text-4xl font-bold text-clinic-600 dark:text-clinic-300 mb-2">
-                <AnimatedCounter value={stat.value} formatter={(val) => val.toLocaleString()} />
+                {stat.value}
                 <span className="text-clinic-500 dark:text-clinic-400">+</span>
               </h3>
               <p className="text-lg font-medium mb-2">{stat.label}</p>
