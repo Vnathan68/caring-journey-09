@@ -2,9 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import PageTransition from '@/components/ui-custom/page-transition';
-import { User, Mail, Phone, MapPin, Calendar, FileText } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, FileText, MessageSquare } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -101,7 +102,7 @@ const ProfilePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="md:col-span-3">
+          <Card className="md:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium">Address Information</CardTitle>
               <CardDescription>Your current contact address</CardDescription>
@@ -115,6 +116,43 @@ const ProfilePage: React.FC = () => {
                   <p className="text-muted-foreground">United States</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium">Recent Messages</CardTitle>
+              <CardDescription>Latest communications</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="p-3 border rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <MessageSquare className="h-4 w-4 text-muted-foreground mt-1" />
+                    <div>
+                      <p className="text-sm font-medium">Dr. Maria Santos</p>
+                      <p className="text-xs text-muted-foreground">Your test results look good...</p>
+                      <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <MessageSquare className="h-4 w-4 text-muted-foreground mt-1" />
+                    <div>
+                      <p className="text-sm font-medium">Front Desk</p>
+                      <p className="text-xs text-muted-foreground">Your insurance has been verified...</p>
+                      <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/dashboard/messages">
+                <Button variant="outline" size="sm" className="w-full mt-2">
+                  View All Messages
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
