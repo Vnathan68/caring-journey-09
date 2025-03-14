@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/main-layout";
 import DashboardLayout from "./components/layout/dashboard-layout";
 import PatientDashboard from "./pages/dashboard/PatientDashboard";
+import ProfilePage from "./pages/dashboard/ProfilePage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -47,6 +48,7 @@ const App = () => (
             {/* Dashboard Routes */}
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<PatientDashboard />} />
+              <Route path="/dashboard/profile" element={<ProfilePage />} />
               {/* Add more dashboard routes as needed */}
             </Route>
             
