@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -88,8 +89,9 @@ export const staggerChildren = (staggerTime: number = 0.1) => ({
 
 // Role-based utilities
 export const ROLES = {
-  SECRETARY_NURSE: 'secretary_nurse',
+  ADMIN: 'admin',
   DOCTOR: 'doctor',
+  CASHIER: 'cashier',
   PATIENT: 'patient',
 } as const
 
