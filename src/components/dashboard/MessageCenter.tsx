@@ -1,11 +1,10 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Send, User, Calendar, FileText, Heart } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ContactsList from './message/ContactsList';
+import MessageView from './message/MessageView';
+import NotificationsTab from './message/NotificationsTab';
 
 // Mock data for messages
 const mockContacts = [
@@ -92,22 +91,11 @@ const mockMessages = [
 
 const MessageCenter: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState(mockContacts[0]);
-  const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredContacts = mockContacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
-    
-    // In a real app, this would send the message to an API
-    console.log('Sending message:', newMessage);
-    
-    // Clear the input
-    setNewMessage('');
-  };
 
   return (
     <Card className="overflow-hidden">
@@ -118,170 +106,21 @@ const MessageCenter: React.FC = () => {
         </TabsList>
 
         <TabsContent value="messages" className="flex-1 flex overflow-hidden m-0 p-0">
-          {/* Contacts sidebar */}
-          <div className="w-full md:w-80 border-r bg-slate-50 flex flex-col">
-            <div className="p-4 border-b">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search messages..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex-1 overflow-auto">
-              {filteredContacts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full p-4">
-                  <User className="h-8 w-8 text-muted-foreground opacity-50" />
-                  <p className="mt-2 text-center text-sm text-muted-foreground">
-                    No contacts found
-                  </p>
-                </div>
-              ) : (
-                filteredContacts.map((contact) => (
-                  <div
-                    key={contact.id}
-                    className={`
-                      p-4 border-b cursor-pointer hover:bg-slate-100 transition-colors
-                      ${selectedContact.id === contact.id ? 'bg-slate-100' : ''}
-                    `}
-                    onClick={() => setSelectedContact(contact)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Avatar>
-                        <AvatarImage src={contact.avatar} alt={contact.name} />
-                        <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-medium truncate">{contact.name}</h4>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-                            {contact.lastMessageTime}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{contact.role}</p>
-                        <p className="text-sm truncate mt-1">
-                          {contact.lastMessage}
-                        </p>
-                      </div>
-                      {contact.unread && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-clinic-600 mt-1"></div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Message area */}
-          <div className="flex-1 flex flex-col">
-            {/* Contact header */}
-            <div className="p-4 border-b flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={selectedContact.avatar} alt={selectedContact.name} />
-                <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{selectedContact.name}</h3>
-                <p className="text-xs text-muted-foreground">{selectedContact.role}</p>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-auto p-4 space-y-4">
-              {mockMessages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isFromContact ? 'justify-start' : 'justify-end'}`}
-                >
-                  <div
-                    className={`
-                      max-w-[80%] md:max-w-[70%] rounded-lg p-3
-                      ${message.isFromContact 
-                        ? 'bg-slate-100 text-foreground' 
-                        : 'bg-clinic-600 text-white'
-                      }
-                    `}
-                  >
-                    <p>{message.content}</p>
-                    <p className={`text-xs mt-1 ${message.isFromContact ? 'text-muted-foreground' : 'text-white/70'}`}>
-                      {message.timestamp}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Message input */}
-            <div className="p-4 border-t flex gap-2">
-              <Input
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-1"
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <Button 
-                onClick={handleSendMessage}
-                className="bg-clinic-600 hover:bg-clinic-700 text-white"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <ContactsList 
+            contacts={filteredContacts}
+            searchQuery={searchQuery}
+            selectedContactId={selectedContact.id}
+            onSearchChange={setSearchQuery}
+            onSelectContact={setSelectedContact}
+          />
+          <MessageView 
+            selectedContact={selectedContact}
+            messages={mockMessages}
+          />
         </TabsContent>
 
         <TabsContent value="notifications" className="m-0 p-0 flex-1 overflow-auto">
-          <div className="p-6">
-            <h3 className="text-lg font-medium mb-4">Notifications</h3>
-            <div className="space-y-4">
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-50 rounded-full p-2">
-                    <Calendar className="h-5 w-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Appointment Reminder</p>
-                    <p className="text-sm text-muted-foreground">
-                      Your prenatal checkup is scheduled for tomorrow at 10:00 AM with Dr. Maria Santos.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">1 day ago</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-green-50 rounded-full p-2">
-                    <FileText className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Test Results Available</p>
-                    <p className="text-sm text-muted-foreground">
-                      Your blood work results are now available. Dr. Maria Santos has reviewed them.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-red-50 rounded-full p-2">
-                    <Heart className="h-5 w-5 text-red-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Health Tip</p>
-                    <p className="text-sm text-muted-foreground">
-                      Remember to stay hydrated! Drinking enough water is important for you and your baby's health.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">3 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <NotificationsTab />
         </TabsContent>
       </Tabs>
     </Card>
