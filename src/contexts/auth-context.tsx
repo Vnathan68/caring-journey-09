@@ -1,15 +1,14 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ROLES, UserRole } from '@/lib/utils';
 
 // Mock user data for demonstration
 const MOCK_USERS = [
   {
-    id: "admin-1",
-    email: "admin@example.com",
+    id: "secretary-1",
+    email: "secretary@example.com",
     password: "password123",
-    name: "Admin User",
-    role: ROLES.ADMIN,
+    name: "Secretary Nurse",
+    role: ROLES.SECRETARY_NURSE,
   },
   {
     id: "doctor-1",
@@ -18,13 +17,6 @@ const MOCK_USERS = [
     name: "Dr. Maria Santos",
     role: ROLES.DOCTOR,
     specialty: "Obstetrics and Gynecology",
-  },
-  {
-    id: "cashier-1",
-    email: "cashier@example.com",
-    password: "password123",
-    name: "Cashier User",
-    role: ROLES.CASHIER,
   },
   {
     id: "patient-1",
