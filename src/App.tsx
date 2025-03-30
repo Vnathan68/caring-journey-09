@@ -21,46 +21,51 @@ import ObstetricsService from "./pages/services/ObstetricsService";
 import GynecologyService from "./pages/services/GynecologyService";
 import FamilyPlanningService from "./pages/services/FamilyPlanningService";
 
+// Create query client instance
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Main Routes */}
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+const App = () => {
+  console.log("App component rendering");
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Main Routes */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                
+                {/* Service Routes */}
+                <Route path="/services/obstetrics" element={<ObstetricsService />} />
+                <Route path="/services/gynecology" element={<GynecologyService />} />
+                <Route path="/services/family-planning" element={<FamilyPlanningService />} />
+              </Route>
               
-              {/* Service Routes */}
-              <Route path="/services/obstetrics" element={<ObstetricsService />} />
-              <Route path="/services/gynecology" element={<GynecologyService />} />
-              <Route path="/services/family-planning" element={<FamilyPlanningService />} />
-            </Route>
-            
-            {/* Dashboard Routes */}
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<PatientDashboard />} />
-              <Route path="/dashboard/profile" element={<ProfilePage />} />
-              <Route path="/dashboard/messages" element={<MessagesPage />} />
-              {/* Add more dashboard routes as needed */}
-            </Route>
-            
-            {/* Catch-all Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+              {/* Dashboard Routes */}
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<PatientDashboard />} />
+                <Route path="/dashboard/profile" element={<ProfilePage />} />
+                <Route path="/dashboard/messages" element={<MessagesPage />} />
+                {/* Add more dashboard routes as needed */}
+              </Route>
+              
+              {/* Catch-all Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

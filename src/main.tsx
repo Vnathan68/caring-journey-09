@@ -4,10 +4,16 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx'
 import './index.css'
 
-// Remove the existing App.css if it's not being used
-// import './App.css' 
+// Create root element and render app
+const rootElement = document.getElementById("root");
 
-createRoot(document.getElementById("root")!).render(
+// Make sure the root element exists
+if (!rootElement) {
+  console.error("Cannot find root element to mount React application");
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
   <HelmetProvider>
     <App />
   </HelmetProvider>

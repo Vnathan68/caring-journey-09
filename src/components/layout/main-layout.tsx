@@ -5,6 +5,8 @@ import Navbar from './navbar';
 import Footer from './footer';
 
 const MainLayout: React.FC = () => {
+  console.log("MainLayout rendering");
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
