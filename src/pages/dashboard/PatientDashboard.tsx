@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -88,14 +87,14 @@ const PatientDashboard: React.FC = () => {
     }
   ];
   
-  // Mock announcements
+  // Mock announcements - Fixing the priority type to use the literal union type expected by AnnouncementFeed
   const announcements = [
     {
       id: 'ann-1',
       title: 'Holiday Hours',
       content: 'The clinic will be closed on May 29th for Memorial Day.',
       date: new Date('2023-05-20'),
-      priority: 'normal',
+      priority: 'normal' as const, // Explicitly typed as 'normal'
       isRead: false
     },
     {
@@ -103,7 +102,7 @@ const PatientDashboard: React.FC = () => {
       title: 'New Prenatal Classes',
       content: 'We are now offering virtual prenatal yoga classes. Register today!',
       date: new Date('2023-05-18'),
-      priority: 'low',
+      priority: 'low' as const, // Explicitly typed as 'low'
       isRead: true
     }
   ];
