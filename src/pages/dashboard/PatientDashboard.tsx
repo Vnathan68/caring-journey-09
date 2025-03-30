@@ -22,18 +22,18 @@ import MedicalRecords from '@/components/dashboard/records/MedicalRecords';
 import AnnouncementFeed from '@/components/dashboard/AnnouncementFeed';
 import PregnancyTracker from '@/components/dashboard/pregnancy/PregnancyTracker';
 
+type AnnouncementPriority = 'high' | 'normal' | 'low';
+
 const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   
-  // Mock data for pregnancy status (this would come from the patient's medical records)
   const isPregnant = true;
   const gestationalAge = 22;
   const dueDate = new Date('2023-09-15');
   
-  // Mock upcoming appointments
   const upcomingAppointments = [
     {
       id: 'apt-1',
@@ -51,7 +51,6 @@ const PatientDashboard: React.FC = () => {
     }
   ];
   
-  // Mock recent test results
   const recentTests = [
     {
       id: 'test-1',
@@ -69,7 +68,6 @@ const PatientDashboard: React.FC = () => {
     }
   ];
   
-  // Mock pending payments
   const pendingPayments = [
     {
       id: 'inv-1',
@@ -87,14 +85,13 @@ const PatientDashboard: React.FC = () => {
     }
   ];
   
-  // Mock announcements - Fixing the priority type to use the literal union type expected by AnnouncementFeed
   const announcements = [
     {
       id: 'ann-1',
       title: 'Holiday Hours',
       content: 'The clinic will be closed on May 29th for Memorial Day.',
       date: new Date('2023-05-20'),
-      priority: 'normal' as const, // Explicitly typed as 'normal'
+      priority: 'normal' as AnnouncementPriority,
       isRead: false
     },
     {
@@ -102,7 +99,7 @@ const PatientDashboard: React.FC = () => {
       title: 'New Prenatal Classes',
       content: 'We are now offering virtual prenatal yoga classes. Register today!',
       date: new Date('2023-05-18'),
-      priority: 'low' as const, // Explicitly typed as 'low'
+      priority: 'low' as AnnouncementPriority,
       isRead: true
     }
   ];
@@ -164,7 +161,7 @@ const PatientDashboard: React.FC = () => {
         </div>
 
         {/* Announcement Banner (if there are unread important announcements) */}
-        {announcements.some(a => !a.isRead && a.priority === 'high' as const) && (
+        {announcements.some(a => !a.isRead && a.priority === 'high' as AnnouncementPriority) && (
           <Card className="bg-amber-50 border-amber-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -221,7 +218,6 @@ const PatientDashboard: React.FC = () => {
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Next Appointment Card */}
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
@@ -283,7 +279,6 @@ const PatientDashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Pregnancy Progress Card (Conditional) */}
               {isPregnant ? (
                 <Card>
                   <CardHeader className="pb-2">
@@ -364,7 +359,6 @@ const PatientDashboard: React.FC = () => {
                 </Card>
               )}
 
-              {/* Recent Files/Test Results Card */}
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
@@ -416,7 +410,6 @@ const PatientDashboard: React.FC = () => {
               </Card>
             </div>
 
-            {/* Billing Overview */}
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
@@ -460,7 +453,6 @@ const PatientDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Announcements Preview */}
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
