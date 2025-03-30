@@ -20,11 +20,11 @@ const MOCK_USERS = [
     specialty: "Obstetrics and Gynecology",
   },
   {
-    id: "cashier-1",
-    email: "cashier@example.com",
+    id: "secretary-1",
+    email: "secretary@example.com",
     password: "password123",
-    name: "Cashier User",
-    role: ROLES.CASHIER,
+    name: "Secretary Nurse",
+    role: ROLES.SECRETARY_NURSE,
   },
   {
     id: "patient-1",
@@ -32,6 +32,11 @@ const MOCK_USERS = [
     password: "password123",
     name: "Patient User",
     role: ROLES.PATIENT,
+    pregnancyStatus: {
+      isPregnant: true,
+      gestationalAge: 22,
+      dueDate: new Date('2023-09-15')
+    }
   },
 ];
 

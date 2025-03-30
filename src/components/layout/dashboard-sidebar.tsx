@@ -6,6 +6,7 @@ import {
   Heart, Home, Calendar, FileText, 
   User, Users, MessageSquare, CreditCard, 
   Settings, LogOut, BarChart2, Clipboard, 
+  Bell
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -45,12 +46,14 @@ const DashboardSidebar: React.FC = () => {
           { name: 'Medical Records', path: '/dashboard/records', icon: FileText },
           { name: 'Prescriptions', path: '/dashboard/prescriptions', icon: Clipboard },
         ];
-      case ROLES.CASHIER:
+      case ROLES.SECRETARY_NURSE:
         return [
           ...commonLinks,
           { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
+          { name: 'Patients', path: '/dashboard/patients', icon: Users },
           { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
           { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
+          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
         ];
       case ROLES.PATIENT:
         return [
@@ -58,6 +61,7 @@ const DashboardSidebar: React.FC = () => {
           { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
           { name: 'Medical Records', path: '/dashboard/records', icon: FileText },
           { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
+          { name: 'Pregnancy', path: '/dashboard/pregnancy', icon: Heart },
         ];
       default:
         return commonLinks;
