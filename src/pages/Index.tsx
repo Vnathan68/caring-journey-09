@@ -13,8 +13,8 @@ const Index: React.FC = () => {
   return (
     <PageTransition>
       <Helmet>
-        <title>FemaleCare Clinic - Specialized Women's Healthcare</title>
-        <meta name="description" content="FemaleCare Clinic provides specialized healthcare for women, including obstetrics, gynecology, and family planning services." />
+        <title>Santa Matilda - Specialized Women's Healthcare</title>
+        <meta name="description" content="Santa Matilda Clinic provides specialized healthcare for women, including obstetrics, gynecology, and family planning services." />
       </Helmet>
       
       {/* Main page sections in logical order */}
