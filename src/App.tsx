@@ -14,6 +14,10 @@ import DashboardLayout from "./components/layout/dashboard-layout";
 import PatientDashboard from "./pages/dashboard/PatientDashboard";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import MessagesPage from "./pages/dashboard/MessagesPage";
+import AppointmentsPage from "./pages/dashboard/AppointmentsPage";
+import RecordsPage from "./pages/dashboard/RecordsPage";
+import PaymentsPage from "./pages/dashboard/PaymentsPage";
+import PregnancyPage from "./pages/dashboard/PregnancyPage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -55,6 +59,10 @@ const App = () => {
                 <Route path="/dashboard" element={<PatientDashboard />} />
                 <Route path="/dashboard/profile" element={<ProfilePage />} />
                 <Route path="/dashboard/messages" element={<MessagesPage />} />
+                <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
+                <Route path="/dashboard/records" element={<RecordsPage />} />
+                <Route path="/dashboard/payments" element={<PaymentsPage />} />
+                <Route path="/dashboard/pregnancy" element={<PregnancyPage />} />
                 {/* Add more dashboard routes as needed */}
               </Route>
               
