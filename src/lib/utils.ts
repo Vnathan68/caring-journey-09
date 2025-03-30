@@ -202,6 +202,6 @@ export function getPregnancyMilestones(): Record<number, string> {
     32: 'Baby practices breathing movements',
     36: 'Baby gains weight rapidly',
     37: 'Baby is considered full term',
-    40: 'Due date!',
+    40: 'Due date!'
   };
 }
