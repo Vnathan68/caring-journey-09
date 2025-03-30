@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -194,7 +193,7 @@ export function getPregnancyMilestones(): Record<number, string> {
     6: 'Heartbeat can be detected',
     8: 'All essential organs begin to form',
     12: 'End of first trimester, baby is fully formed',
-    16: 'Baby's gender may be visible on ultrasound',
+    16: 'Baby gender may be visible on ultrasound',
     18: 'Baby begins to hear sounds',
     20: 'Detailed anatomy scan typically performed',
     24: 'Baby is viable outside the womb with medical support',
