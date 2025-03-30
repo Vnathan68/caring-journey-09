@@ -164,7 +164,7 @@ const PatientDashboard: React.FC = () => {
         </div>
 
         {/* Announcement Banner (if there are unread important announcements) */}
-        {announcements.some(a => !a.isRead && a.priority === 'high') && (
+        {announcements.some(a => !a.isRead && a.priority === 'high' as const) && (
           <Card className="bg-amber-50 border-amber-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
