@@ -1,13 +1,30 @@
 
-import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import LoadingSpinner from '@/components/ui-custom/loading-spinner';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import DashboardSidebar from './dashboard-sidebar';
+import { ROLES } from '@/lib/utils';
 
 const DashboardLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to the appropriate dashboard based on user role
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      // If we're at exactly /dashboard, redirect based on role
+      if (window.location.pathname === '/dashboard') {
+        if (user.role === ROLES.DOCTOR) {
+          // Already on the doctor dashboard, no redirect needed
+        } else if (user.role === ROLES.PATIENT) {
+          navigate('/dashboard/patient', { replace: true });
+        }
+        // Add other roles as needed
+      }
+    }
+  }, [user, isAuthenticated, navigate]);
 
   if (isLoading) {
     return (

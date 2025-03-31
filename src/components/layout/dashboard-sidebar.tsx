@@ -5,7 +5,8 @@ import {
   Heart, Home, Calendar, FileText, 
   User, Users, MessageSquare, CreditCard, 
   Settings, LogOut, BarChart2, Clipboard, 
-  Bell
+  Bell, Stethoscope, Shield, Inbox, Video,
+  Phone, ChevronRight, Lock, FileCheck, VolumeX
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -50,14 +51,22 @@ const DashboardSidebar: React.FC = () => {
           { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
           { name: 'Finance', path: '/dashboard/finance', icon: CreditCard },
           { name: 'Settings', path: '/dashboard/settings', icon: Settings },
+          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
         ];
       case ROLES.DOCTOR:
         return [
-          ...commonLinks,
+          { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Patients', path: '/dashboard/patients', icon: Users },
           { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
+          { name: 'Messages', path: '/dashboard/messages', icon: MessageSquare },
           { name: 'Medical Records', path: '/dashboard/records', icon: FileText },
           { name: 'Prescriptions', path: '/dashboard/prescriptions', icon: Clipboard },
+          { name: 'Telemedicine', path: '/dashboard/telemedicine', icon: Video },
+          { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
+          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
+          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
+          { name: 'Profile', path: '/dashboard/profile', icon: User },
+          { name: 'Settings', path: '/dashboard/settings', icon: Settings },
         ];
       case ROLES.SECRETARY_NURSE:
         return [

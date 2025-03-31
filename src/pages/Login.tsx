@@ -5,14 +5,22 @@ import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GlassCard from '@/components/ui-custom/glass-card';
 import PageTransition from '@/components/ui-custom/page-transition';
 import { toast } from '@/hooks/use-toast';
-import { Heart, Loader2 } from 'lucide-react';
+import { 
+  Heart, Loader2, Mail, Key, Shield, 
+  Smartphone, CheckCircle2, AlertCircle 
+} from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,6 +36,34 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
     
     try {
+      // In a real application, this would first validate credentials
+      // then check if 2FA is needed
+      if (!showTwoFactor) {
+        // Mock 2FA requirement check
+        const needs2FA = email.includes('doctor');
+        
+        if (needs2FA) {
+          setShowTwoFactor(true);
+          toast.success('Please enter the verification code sent to your device');
+          setIsSubmitting(false);
+          return;
+        }
+      } else {
+        // Validate 2FA code
+        if (!twoFactorCode || twoFactorCode.length !== 6) {
+          toast.error('Please enter a valid 6-digit verification code');
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Mock 2FA code validation
+        if (twoFactorCode !== '123456') {
+          toast.error('Invalid verification code');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       await login(email, password);
       toast.success('Login successful');
       navigate('/dashboard');
@@ -37,6 +73,133 @@ const Login: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  const renderLoginForm = () => (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="yourname@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <Link to="/forgot-password" className="text-xs text-clinic-600 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
+        <div className="relative">
+          <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="remember-me" 
+          checked={rememberMe} 
+          onCheckedChange={() => setRememberMe(!rememberMe)}
+        />
+        <label
+          htmlFor="remember-me"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Remember me
+        </label>
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing in...
+          </>
+        ) : 'Sign in'}
+      </Button>
+    </form>
+  );
+
+  const renderTwoFactorForm = () => (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="text-center mb-4">
+        <Shield className="h-12 w-12 mx-auto text-clinic-600 mb-2" />
+        <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
+        <p className="text-sm text-muted-foreground">
+          We've sent a 6-digit code to your registered device. 
+          Enter the code to continue.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="twoFactorCode">Verification Code</Label>
+        <div className="relative">
+          <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="twoFactorCode"
+            type="text"
+            placeholder="123456"
+            value={twoFactorCode}
+            onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            required
+            maxLength={6}
+            className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500 text-center font-mono text-lg tracking-widest"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between text-sm">
+        <button 
+          type="button" 
+          className="text-clinic-600 hover:underline"
+          onClick={() => setShowTwoFactor(false)}
+        >
+          Back to login
+        </button>
+        <button 
+          type="button" 
+          className="text-clinic-600 hover:underline"
+        >
+          Resend code
+        </button>
+      </div>
+
+      <Button 
+        type="submit" 
+        className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Verifying...
+          </>
+        ) : 'Verify'}
+      </Button>
+    </form>
+  );
 
   return (
     <PageTransition className="min-h-screen flex items-center justify-center px-4 py-12">
@@ -50,51 +213,7 @@ const Login: React.FC = () => {
         </div>
         
         <GlassCard className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="yourname@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="text-xs text-clinic-600 hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-12 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : 'Sign in'}
-            </Button>
-          </form>
+          {showTwoFactor ? renderTwoFactorForm() : renderLoginForm()}
           
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
@@ -110,6 +229,7 @@ const Login: React.FC = () => {
           <p>Demo Accounts:</p>
           <p>admin@example.com / doctor@example.com / cashier@example.com / patient@example.com</p>
           <p>All with password: password123</p>
+          <p className="mt-1 text-clinic-600">(Use "123456" for the 2FA code with doctor account)</p>
         </div>
       </div>
     </PageTransition>
