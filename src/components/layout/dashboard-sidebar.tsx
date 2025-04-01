@@ -1,157 +1,223 @@
+import {
+  LayoutDashboard,
+  Settings,
+  User2,
+  FileText,
+  LogOut,
+  Calendar,
+  Users,
+  Wallet,
+  Activity,
+} from "lucide-react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  Heart, Home, Calendar, FileText, 
-  User, Users, MessageSquare, CreditCard, 
-  Settings, LogOut, BarChart2, Clipboard, 
-  Bell, Stethoscope, Shield, Inbox, Video,
-  Phone, ChevronRight, Lock, FileCheck, VolumeX
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/auth-context';
-import { ROLES } from '@/lib/utils';
-import { 
-  Sidebar, 
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent
-} from '@/components/ui/sidebar';
-import { useSidebar } from '@/components/ui/sidebar';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarTrigger } from "@/components/ui/sidebar"
+import { ROLES } from "@/lib/utils"
+import { useAuth } from "@/contexts/auth-context"
+import { cn } from "@/lib/utils"
 
-const DashboardSidebar: React.FC = () => {
-  const location = useLocation();
+export function DashboardSidebar() {
   const { user, logout } = useAuth();
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Define navigation links based on user role
-  const getNavLinks = () => {
-    if (!user) return [];
-
-    const commonLinks = [
-      { name: 'Dashboard', path: '/dashboard', icon: Home },
-      { name: 'Profile', path: '/dashboard/profile', icon: User },
-      { name: 'Messages', path: '/dashboard/messages', icon: MessageSquare },
-    ];
-
-    switch (user.role) {
-      case ROLES.ADMIN:
-        return [
-          ...commonLinks,
-          { name: 'Users', path: '/dashboard/users', icon: Users },
-          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
-          { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
-          { name: 'Finance', path: '/dashboard/finance', icon: CreditCard },
-          { name: 'Settings', path: '/dashboard/settings', icon: Settings },
-          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
-        ];
-      case ROLES.DOCTOR:
-        return [
-          { name: 'Dashboard', path: '/dashboard', icon: Home },
-          { name: 'Patients', path: '/dashboard/patients', icon: Users },
-          { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
-          { name: 'Messages', path: '/dashboard/messages', icon: MessageSquare },
-          { name: 'Medical Records', path: '/dashboard/records', icon: FileText },
-          { name: 'Prescriptions', path: '/dashboard/prescriptions', icon: Clipboard },
-          { name: 'Telemedicine', path: '/dashboard/telemedicine', icon: Video },
-          { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
-          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
-          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
-          { name: 'Profile', path: '/dashboard/profile', icon: User },
-          { name: 'Settings', path: '/dashboard/settings', icon: Settings },
-        ];
-      case ROLES.SECRETARY_NURSE:
-        return [
-          ...commonLinks,
-          { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
-          { name: 'Patients', path: '/dashboard/patients', icon: Users },
-          { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
-          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
-          { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
-        ];
-      case ROLES.PATIENT:
-        return [
-          ...commonLinks,
-          { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
-          { name: 'Medical Records', path: '/dashboard/records', icon: FileText },
-          { name: 'Payments', path: '/dashboard/payments', icon: CreditCard },
-          { name: 'Pregnancy', path: '/dashboard/pregnancy', icon: Heart },
-        ];
-      default:
-        return commonLinks;
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
-  const navLinks = getNavLinks();
-
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className={cn(
-          "flex items-center p-4",
-          collapsed ? "justify-center" : "justify-between"
-        )}>
-          {!collapsed && (
-            <Link to="/" className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-clinic-600" />
-              <span className="font-poppins font-semibold text-lg">Santa Matilda</span>
-            </Link>
-          )}
-          {collapsed && (
-            <Heart className="h-6 w-6 text-clinic-600" />
-          )}
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navLinks.map((link) => (
-                <SidebarMenuItem key={link.path}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={location.pathname === link.path}
-                    tooltip={link.name}
-                  >
-                    <Link to={link.path}>
-                      <link.icon className="h-5 w-5" />
-                      <span>{link.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter>
-        <div className="p-4">
-          <Button
-            variant="ghost"
-            onClick={logout}
+    <Sidebar className="block md:hidden">
+      <SidebarTrigger>Menu</SidebarTrigger>
+      <SidebarContent className="gap-0">
+        <SidebarHeader className="pb-2">
+          <Link to="/" className="px-3">
+            Santa Matilda
+          </Link>
+        </SidebarHeader>
+        <Separator />
+        <SidebarMenu className="px-3">
+          <Link
+            to="/dashboard"
             className={cn(
-              "w-full flex items-center text-muted-foreground hover:text-foreground",
-              "hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+              location.pathname === "/dashboard" && "bg-accent text-foreground"
             )}
           >
-            <LogOut className={cn("h-5 w-5", !collapsed && "mr-3")} />
-            {!collapsed && <span>Logout</span>}
-          </Button>
-        </div>
-      </SidebarFooter>
+            <LayoutDashboard className="h-5 w-5" />
+            Dashboard
+          </Link>
+          <Link
+            to="/dashboard/patients"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+              location.pathname === "/dashboard/patients" && "bg-accent text-foreground"
+            )}
+          >
+            <Users className="h-5 w-5" />
+            Patients
+          </Link>
+          {(user?.role === ROLES.SECRETARY_NURSE || user?.role === ROLES.ADMIN) && (
+            <Link
+              to="/dashboard/appointments"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+                location.pathname === "/dashboard/appointments" && "bg-accent text-foreground"
+              )}
+            >
+              <Calendar className="h-5 w-5" />
+              Appointments
+            </Link>
+          )}
+          {(user?.role === ROLES.CASHIER || user?.role === ROLES.ADMIN) && (
+            <Link
+              to="/dashboard/billing"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+                location.pathname === "/dashboard/billing" && "bg-accent text-foreground"
+              )}
+            >
+              <Wallet className="h-5 w-5" />
+              Billing
+            </Link>
+          )}
+          {(user?.role === ROLES.DOCTOR || user?.role === ROLES.ADMIN) && (
+            <Link
+              to="/dashboard/prescriptions"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+                location.pathname === "/dashboard/prescriptions" && "bg-accent text-foreground"
+              )}
+            >
+              <FileText className="h-5 w-5" />
+              Prescriptions
+            </Link>
+          )}
+          <Link
+            to="/dashboard/activity"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors",
+              location.pathname === "/dashboard/activity" && "bg-accent text-foreground"
+            )}
+          >
+            <Activity className="h-5 w-5" />
+            Activity
+          </Link>
+        </SidebarMenu>
+        <Separator />
+        <SidebarFooter className="p-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex h-8 w-full items-center justify-between rounded-md px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                    <AvatarFallback>OM</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium leading-none">{user?.name}</span>
+                </div>
+                <Settings className="mr-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" forceMount className="w-[200px]">
+              <DropdownMenuItem>
+                <User2 className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarFooter>
+      </SidebarContent>
     </Sidebar>
-  );
-};
+  )
+}
 
-export default DashboardSidebar;
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+function SidebarMain({ className, children, ...props }: SidebarProps) {
+  return (
+    <div className={cn("hidden md:block flex-col space-y-6 w-[280px] border-r p-3", className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
+function SidebarHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex items-center space-x-2 px-3 py-2", className)} {...props}>Santa Matilda</div>
+}
+
+function SidebarMenu({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <nav className={cn("flex flex-col space-y-1", className)} {...props}>
+    </nav>
+  )
+}
+
+function SidebarMenuItem({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("flex items-center space-x-2 px-3 py-2", className)} {...props}>
+    </div>
+  )
+}
+
+function SidebarFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="flex h-8 w-full items-center justify-between rounded-md px-3 py-2">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src="/avatars/01.png" alt="Avatar" />
+              <AvatarFallback>OM</AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium leading-none">{user?.name}</span>
+          </div>
+          <Settings className="mr-2 h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" forceMount className="w-[200px]">
+        <DropdownMenuItem>
+          <User2 className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+          <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export { SidebarMain, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarFooter }
