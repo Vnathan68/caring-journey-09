@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import PageTransition from '@/components/ui-custom/page-transition';
 import { Helmet } from 'react-helmet-async';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { 
   Search, Filter, Plus, User, Heart, Calendar, 
@@ -735,7 +735,6 @@ const PatientsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Check if there's a patient ID in the URL query params
   React.useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const patientId = searchParams.get('id');
@@ -744,7 +743,6 @@ const PatientsPage: React.FC = () => {
     }
   }, [location.search]);
   
-  // Filter patients based on search query and status filter
   const filteredPatients = mockPatients
     .filter(patient => 
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -765,17 +763,14 @@ const PatientsPage: React.FC = () => {
   
   const handleViewPatient = (id: string) => {
     setSelectedPatient(id);
-    // Update the URL with the patient ID without refreshing the page
     navigate(`/dashboard/patients?id=${id}`, { replace: true });
   };
   
   const handleBackToList = () => {
     setSelectedPatient(null);
-    // Remove the patient ID from the URL
     navigate('/dashboard/patients', { replace: true });
   };
   
-  // If a patient is selected, show their details
   if (selectedPatient) {
     return (
       <PageTransition>
@@ -959,7 +954,6 @@ const PatientsPage: React.FC = () => {
         </Card>
       </div>
       
-      {/* Add Patient Dialog */}
       <Dialog open={isAddPatientDialogOpen} onOpenChange={setIsAddPatientDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

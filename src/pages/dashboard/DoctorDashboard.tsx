@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +19,6 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-// Sample data for the dashboard
 const mockAppointments = [
   {
     id: 'apt-1',
@@ -28,8 +26,8 @@ const mockAppointments = [
     patientId: 'P1001',
     type: 'Prenatal Checkup',
     time: new Date(new Date().setHours(9, 0, 0)),
-    status: 'waiting', // waiting, in-progress, completed, cancelled, no-show
-    urgency: 'normal', // normal, urgent
+    status: 'waiting',
+    urgency: 'normal',
     notes: 'First trimester checkup',
     avatar: 'https://randomuser.me/api/portraits/women/79.jpg'
   },
@@ -120,7 +118,7 @@ const mockUrgentCases = [
     reason: 'Severe abdominal pain',
     reportedAt: new Date(new Date().setHours(8, 15, 0)),
     appointmentId: 'apt-2',
-    status: 'flagged', // flagged, addressed
+    status: 'flagged',
     reportedBy: 'Nurse Rodriguez'
   },
   {
@@ -145,7 +143,6 @@ const DoctorDashboard: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
 
-  // Filter appointments based on search query and status filter
   const filteredAppointments = appointments
     .filter(apt => 
       apt.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,7 +151,6 @@ const DoctorDashboard: React.FC = () => {
     )
     .filter(apt => statusFilter === 'all' || apt.status === statusFilter);
 
-  // Count appointments by status
   const appointmentCounts = {
     waiting: appointments.filter(a => a.status === 'waiting').length,
     inProgress: appointments.filter(a => a.status === 'in-progress').length,
@@ -202,7 +198,6 @@ const DoctorDashboard: React.FC = () => {
   };
 
   const handleAddNote = (id: string) => {
-    // In a real app, this would open a modal to add notes
     toast.success('Note added to appointment');
   };
 
@@ -227,27 +222,23 @@ const DoctorDashboard: React.FC = () => {
     const prevDay = new Date(currentDate);
     prevDay.setDate(prevDay.getDate() - 1);
     setCurrentDate(prevDay);
-    // In a real app, this would fetch appointments for the previous day
   };
 
   const handleNextDay = () => {
     const nextDay = new Date(currentDate);
     nextDay.setDate(nextDay.getDate() + 1);
     setCurrentDate(nextDay);
-    // In a real app, this would fetch appointments for the next day
   };
 
   const handleTodayClick = () => {
     setCurrentDate(new Date());
-    // In a real app, this would fetch appointments for today
   };
 
-  // Status badge color mapping
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'waiting': return 'secondary';
       case 'in-progress': return 'default';
-      case 'completed': return 'success';
+      case 'completed': return 'outline';
       case 'cancelled': return 'outline';
       case 'no-show': return 'destructive';
       default: return 'secondary';
@@ -330,7 +321,6 @@ const DoctorDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 flex items-center justify-between">
@@ -381,7 +371,6 @@ const DoctorDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Urgent Cases */}
         {urgentCases.filter(c => c.status === 'flagged').length > 0 && (
           <Card className="border-red-200 bg-red-50 dark:bg-red-900/10">
             <CardHeader className="pb-3">
@@ -425,7 +414,6 @@ const DoctorDashboard: React.FC = () => {
           </Card>
         )}
 
-        {/* Appointments Section */}
         <Card>
           <CardHeader className="pb-3">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
