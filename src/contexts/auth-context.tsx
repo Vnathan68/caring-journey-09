@@ -19,7 +19,7 @@ const MOCK_USERS = [
     name: "Dr. Maria Santos",
     role: ROLES.DOCTOR,
     specialty: "Obstetrics and Gynecology",
-    twoFactorEnabled: true, // Enable 2FA for demo
+    twoFactorEnabled: false, // Changed from true to false
   },
   {
     id: "secretary-1",

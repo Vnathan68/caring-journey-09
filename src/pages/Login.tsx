@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
@@ -36,34 +35,6 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // In a real application, this would first validate credentials
-      // then check if 2FA is needed
-      if (!showTwoFactor) {
-        // Mock 2FA requirement check
-        const needs2FA = email.includes('doctor');
-        
-        if (needs2FA) {
-          setShowTwoFactor(true);
-          toast.success('Please enter the verification code sent to your device');
-          setIsSubmitting(false);
-          return;
-        }
-      } else {
-        // Validate 2FA code
-        if (!twoFactorCode || twoFactorCode.length !== 6) {
-          toast.error('Please enter a valid 6-digit verification code');
-          setIsSubmitting(false);
-          return;
-        }
-        
-        // Mock 2FA code validation
-        if (twoFactorCode !== '123456') {
-          toast.error('Invalid verification code');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       await login(email, password);
       toast.success('Login successful');
       navigate('/dashboard');
@@ -229,7 +200,7 @@ const Login: React.FC = () => {
           <p>Demo Accounts:</p>
           <p>admin@example.com / doctor@example.com / cashier@example.com / patient@example.com</p>
           <p>All with password: password123</p>
-          <p className="mt-1 text-clinic-600">(Use "123456" for the 2FA code with doctor account)</p>
+          <p className="mt-1">(No 2FA is required for any account)</p>
         </div>
       </div>
     </PageTransition>
