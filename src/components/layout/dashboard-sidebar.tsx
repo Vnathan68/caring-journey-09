@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   Settings,
@@ -22,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarTrigger } from "@/components/ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter as UISidebarFooter, SidebarHeader as UISidebarHeader, SidebarMenu as UISidebarMenu, SidebarMenuItem as UISidebarMenuItem, SidebarTrigger } from "@/components/ui/sidebar"
 import { ROLES } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
 import { cn } from "@/lib/utils"
@@ -41,13 +42,13 @@ export function DashboardSidebar() {
     <Sidebar className="block md:hidden">
       <SidebarTrigger>Menu</SidebarTrigger>
       <SidebarContent className="gap-0">
-        <SidebarHeader className="pb-2">
+        <UISidebarHeader className="pb-2">
           <Link to="/" className="px-3">
             Santa Matilda
           </Link>
-        </SidebarHeader>
+        </UISidebarHeader>
         <Separator />
-        <SidebarMenu className="px-3">
+        <UISidebarMenu className="px-3">
           <Link
             to="/dashboard"
             className={cn(
@@ -80,7 +81,7 @@ export function DashboardSidebar() {
               Appointments
             </Link>
           )}
-          {(user?.role === ROLES.CASHIER || user?.role === ROLES.ADMIN) && (
+          {(user?.role === ROLES.ADMIN) && (
             <Link
               to="/dashboard/billing"
               className={cn(
@@ -114,9 +115,9 @@ export function DashboardSidebar() {
             <Activity className="h-5 w-5" />
             Activity
           </Link>
-        </SidebarMenu>
+        </UISidebarMenu>
         <Separator />
-        <SidebarFooter className="p-3">
+        <UISidebarFooter className="p-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex h-8 w-full items-center justify-between rounded-md px-3 py-2">
@@ -144,7 +145,7 @@ export function DashboardSidebar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </SidebarFooter>
+        </UISidebarFooter>
       </SidebarContent>
     </Sidebar>
   )
