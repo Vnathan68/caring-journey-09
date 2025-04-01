@@ -4,7 +4,7 @@ import { Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import LoadingSpinner from '@/components/ui-custom/loading-spinner';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from './dashboard-sidebar';
+import DashboardSidebar from './dashboard-sidebar';
 import { ROLES } from '@/lib/utils';
 
 const DashboardLayout: React.FC = () => {

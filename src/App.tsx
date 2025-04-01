@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,11 +30,13 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ObstetricsService from "./pages/services/ObstetricsService";
 import GynecologyService from "./pages/services/GynecologyService";
 import FamilyPlanningService from "./pages/services/FamilyPlanningService";
-import PrescriptionsPage from "./pages/dashboard/PrescriptionsPage";
 
+// Create query client instance
 const queryClient = new QueryClient();
 
-function App() {
+const App = () => {
+  console.log("App component rendering");
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -42,6 +45,7 @@ function App() {
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Main Routes */}
               <Route element={<MainLayout />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<About />} />
@@ -50,11 +54,13 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 
+                {/* Service Routes */}
                 <Route path="/services/obstetrics" element={<ObstetricsService />} />
                 <Route path="/services/gynecology" element={<GynecologyService />} />
                 <Route path="/services/family-planning" element={<FamilyPlanningService />} />
               </Route>
               
+              {/* Dashboard Routes */}
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<DoctorDashboard />} />
                 <Route path="/dashboard/patient" element={<PatientDashboard />} />
@@ -69,9 +75,9 @@ function App() {
                 <Route path="/dashboard/announcements" element={<AnnouncementsPage />} />
                 <Route path="/dashboard/settings" element={<SettingsPage />} />
                 <Route path="/dashboard/reports" element={<ReportsPage />} />
-                <Route path="/dashboard/prescriptions" element={<PrescriptionsPage />} />
               </Route>
               
+              {/* Catch-all Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
@@ -79,6 +85,6 @@ function App() {
       </AuthProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
