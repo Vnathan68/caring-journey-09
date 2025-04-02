@@ -19,6 +19,12 @@ const SecretaryDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = React.useState('overview');
 
+  // Handler for book appointment - can be implemented to open a modal or navigate to booking page
+  const handleBookAppointment = () => {
+    console.log("Book appointment clicked");
+    // This could open a modal or navigate to a booking page
+  };
+
   return (
     <PageTransition>
       <Helmet>
@@ -30,8 +36,8 @@ const SecretaryDashboard: React.FC = () => {
       </Helmet>
 
       <DashboardHeader
-        title={`Welcome back, ${user?.name?.split(' ')[0] || 'Secretary'}`}
-        description="Manage patients, appointments, and clinic operations"
+        userName={user?.name?.split(' ')[0] || 'Secretary'}
+        onBookAppointment={handleBookAppointment}
       />
 
       <Tabs 
