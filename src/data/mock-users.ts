@@ -26,6 +26,10 @@ export const MOCK_USERS = [
     password: "password123",
     name: "Ana Ramirez",
     role: ROLES.SECRETARY_NURSE,
+    position: "Head Nurse",
+    department: "Maternity Ward",
+    years_experience: 8,
+    certifications: ["Registered Nurse", "Midwifery Certificate"],
     twoFactorEnabled: false,
   },
   {
