@@ -4,34 +4,51 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, Mail, Key } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+const formSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
+  rememberMe: z.boolean().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface LoginFormProps {
   onShowTwoFactor: () => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
+  
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error('Please enter both email and password');
-      return;
-    }
-    
+  const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
+      await login(data.email, data.password);
       toast.success('Login successful');
       // Note: Navigation happens in the parent component
     } catch (error) {
@@ -42,71 +59,94 @@ const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="yourname@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
-          <Link to="/forgot-password" className="text-xs text-clinic-600 hover:underline">
-            Forgot password?
-          </Link>
-        </div>
-        <div className="relative">
-          <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="remember-me" 
-          checked={rememberMe} 
-          onCheckedChange={() => setRememberMe(!rememberMe)}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Email</FormLabel>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input
+                    placeholder="yourname@example.com"
+                    type="email"
+                    {...field}
+                    className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <label
-          htmlFor="remember-me"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <div className="flex items-center justify-between">
+                <FormLabel>Password</FormLabel>
+                <Link to="/forgot-password" className="text-xs text-clinic-600 hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    {...field}
+                    className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500"
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="rememberMe"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2">
+              <FormControl>
+                <Checkbox 
+                  checked={field.value} 
+                  onCheckedChange={field.onChange}
+                  id="remember-me"
+                />
+              </FormControl>
+              <label
+                htmlFor="remember-me"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                onClick={() => form.setValue('rememberMe', !form.getValues('rememberMe'))}
+              >
+                Remember me
+              </label>
+            </FormItem>
+          )}
+        />
+        
+        <Button 
+          type="submit" 
+          className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
+          disabled={isSubmitting}
         >
-          Remember me
-        </label>
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Signing in...
-          </>
-        ) : 'Sign in'}
-      </Button>
-    </form>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : 'Sign in'}
+        </Button>
+      </form>
+    </Form>
   );
 };
 

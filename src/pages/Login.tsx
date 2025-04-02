@@ -14,17 +14,25 @@ const Login: React.FC = () => {
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, verifyTwoFactorCode } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
-      await login("", ""); // These values are managed in the LoginForm component
+      if (showTwoFactor) {
+        await verifyTwoFactorCode(twoFactorCode);
+      } else {
+        // This flow is now handled by the LoginForm component
+        return;
+      }
       navigate('/dashboard');
     } catch (error) {
-      // Error handling is done in the LoginForm component
+      // Error handling is done in the form components
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
