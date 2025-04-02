@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ROLES, UserRole } from '@/lib/utils';
 
@@ -19,13 +18,13 @@ const MOCK_USERS = [
     name: "Dr. Maria Santos",
     role: ROLES.DOCTOR,
     specialty: "Obstetrics and Gynecology",
-    twoFactorEnabled: false, // Changed from true to false
+    twoFactorEnabled: false,
   },
   {
     id: "secretary-1",
     email: "secretary@example.com",
     password: "password123",
-    name: "Secretary Nurse",
+    name: "Ana Ramirez",
     role: ROLES.SECRETARY_NURSE,
     twoFactorEnabled: false,
   },

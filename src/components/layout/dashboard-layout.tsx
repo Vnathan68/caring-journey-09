@@ -20,6 +20,8 @@ const DashboardLayout: React.FC = () => {
           // Already on the doctor dashboard, no redirect needed
         } else if (user.role === ROLES.PATIENT) {
           navigate('/dashboard/patient', { replace: true });
+        } else if (user.role === ROLES.SECRETARY_NURSE) {
+          navigate('/dashboard/secretary', { replace: true });
         }
         // Add other roles as needed
       }

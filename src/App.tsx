@@ -13,6 +13,7 @@ import MainLayout from "./components/layout/main-layout";
 import DashboardLayout from "./components/layout/dashboard-layout";
 import PatientDashboard from "./pages/dashboard/PatientDashboard";
 import DoctorDashboard from "./pages/dashboard/DoctorDashboard";
+import SecretaryDashboard from "./pages/dashboard/SecretaryDashboard";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import MessagesPage from "./pages/dashboard/MessagesPage";
 import AppointmentsPage from "./pages/dashboard/AppointmentsPage";
@@ -64,6 +65,7 @@ const App = () => {
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<DoctorDashboard />} />
                 <Route path="/dashboard/patient" element={<PatientDashboard />} />
+                <Route path="/dashboard/secretary" element={<SecretaryDashboard />} />
                 <Route path="/dashboard/profile" element={<ProfilePage />} />
                 <Route path="/dashboard/messages" element={<MessagesPage />} />
                 <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
