@@ -22,6 +22,8 @@ const DashboardLayout: React.FC = () => {
           navigate('/dashboard/patient', { replace: true });
         } else if (user.role === ROLES.SECRETARY_NURSE) {
           navigate('/dashboard/secretary', { replace: true });
+        } else if (user.role === ROLES.ADMIN) {
+          navigate('/dashboard/admin', { replace: true });
         }
         // Add other roles as needed
       }

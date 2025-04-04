@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -45,13 +44,16 @@ const DashboardSidebar: React.FC = () => {
     switch (user.role) {
       case ROLES.ADMIN:
         return [
-          ...commonLinks,
+          { name: 'Dashboard', path: '/dashboard/admin', icon: Home },
           { name: 'Users', path: '/dashboard/users', icon: Users },
-          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
           { name: 'Appointments', path: '/dashboard/appointments', icon: Calendar },
-          { name: 'Finance', path: '/dashboard/finance', icon: CreditCard },
-          { name: 'Settings', path: '/dashboard/settings', icon: Settings },
+          { name: 'Patients', path: '/dashboard/patients', icon: Users },
+          { name: 'Messages', path: '/dashboard/messages', icon: MessageSquare },
+          { name: 'Reports', path: '/dashboard/reports', icon: BarChart2 },
+          { name: 'Finance', path: '/dashboard/payments', icon: CreditCard },
           { name: 'Announcements', path: '/dashboard/announcements', icon: Bell },
+          { name: 'Settings', path: '/dashboard/settings', icon: Settings },
+          { name: 'Profile', path: '/dashboard/profile', icon: User },
         ];
       case ROLES.DOCTOR:
         return [
