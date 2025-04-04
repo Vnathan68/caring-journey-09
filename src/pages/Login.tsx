@@ -9,12 +9,14 @@ import LoginForm from '@/components/auth/LoginForm';
 import TwoFactorForm from '@/components/auth/TwoFactorForm';
 import LoginHeader from '@/components/auth/LoginHeader';
 import LoginFooter from '@/components/auth/LoginFooter';
+import { ROLES } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 
 const Login: React.FC = () => {
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, verifyTwoFactorCode } = useAuth();
+  const { verifyTwoFactorCode } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,14 +25,31 @@ const Login: React.FC = () => {
     
     try {
       if (showTwoFactor) {
-        await verifyTwoFactorCode(twoFactorCode);
-      } else {
-        // This flow is now handled by the LoginForm component
-        return;
-      }
-      navigate('/dashboard');
+        const user = await verifyTwoFactorCode(twoFactorCode);
+        toast.success('Login successful');
+        
+        // Redirect based on user role after 2FA verification
+        if (user) {
+          switch(user.role) {
+            case ROLES.ADMIN:
+              navigate('/dashboard/admin', { replace: true });
+              break;
+            case ROLES.DOCTOR:
+              navigate('/dashboard', { replace: true });
+              break;
+            case ROLES.PATIENT:
+              navigate('/dashboard/patient', { replace: true });
+              break;
+            case ROLES.SECRETARY_NURSE:
+              navigate('/dashboard/secretary', { replace: true });
+              break;
+            default:
+              navigate('/dashboard', { replace: true });
+          }
+        }
+      } 
     } catch (error) {
-      // Error handling is done in the form components
+      toast.error(error instanceof Error ? error.message : 'Verification failed');
     } finally {
       setIsSubmitting(false);
     }

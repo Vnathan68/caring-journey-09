@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { ROLES } from '@/lib/utils';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -33,7 +34,8 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,11 +50,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
     setIsSubmitting(true);
     
     try {
-      await login(data.email, data.password);
+      const user = await login(data.email, data.password);
       toast.success('Login successful');
-      // Note: Navigation happens in the parent component
+      
+      // Redirect to the appropriate dashboard based on user role
+      if (user) {
+        switch(user.role) {
+          case ROLES.ADMIN:
+            navigate('/dashboard/admin', { replace: true });
+            break;
+          case ROLES.DOCTOR:
+            navigate('/dashboard', { replace: true });
+            break;
+          case ROLES.PATIENT:
+            navigate('/dashboard/patient', { replace: true });
+            break;
+          case ROLES.SECRETARY_NURSE:
+            navigate('/dashboard/secretary', { replace: true });
+            break;
+          default:
+            navigate('/dashboard', { replace: true });
+        }
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Login failed');
+      if (error instanceof Error && error.message === 'Two-factor authentication required') {
+        onShowTwoFactor();
+      } else {
+        toast.error(error instanceof Error ? error.message : 'Login failed');
+      }
     } finally {
       setIsSubmitting(false);
     }
