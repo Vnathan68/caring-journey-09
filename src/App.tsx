@@ -28,6 +28,7 @@ import AnnouncementsPage from './pages/dashboard/AnnouncementsPage';
 import ObstetricsService from './pages/services/ObstetricsService';
 import GynecologyService from './pages/services/GynecologyService';
 import FamilyPlanningService from './pages/services/FamilyPlanningService';
+import UsersPage from './pages/dashboard/UsersPage';
 import { Toaster } from './components/ui/toaster';
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
             <Route path="pregnancy" element={<PregnancyPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="patients" element={<PatientsPage />} />
+            <Route path="users" element={<UsersPage />} />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="telemedicine" element={<TelemedicinePage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />
