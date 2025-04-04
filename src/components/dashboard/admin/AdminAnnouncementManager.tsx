@@ -63,7 +63,7 @@ const mockAnnouncements = [
 
 const AdminAnnouncementManager: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [audienceFilter, setAudienceFilter] = useState('all');
+  const [audienceFilter, setAudienceFilter] = useState<string>('all');
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
     content: '',
@@ -81,7 +81,7 @@ const AdminAnnouncementManager: React.FC = () => {
       announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
       announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesAudience = audienceFilter === 'all' || announcement.audience.includes(audienceFilter);
+    const matchesAudience = audienceFilter === 'all' || announcement.audience.includes(audienceFilter as any);
     
     return matchesSearch && matchesAudience;
   });
