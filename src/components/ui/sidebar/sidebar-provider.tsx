@@ -2,16 +2,7 @@ import * as React from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { SidebarContext } from "./sidebar-context";
-
-export function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.");
-  }
-
-  return context;
-}
+import { SidebarContext, useSidebar } from "./sidebar-context";
 
 export const SidebarProvider = React.forwardRef<
   HTMLDivElement,
