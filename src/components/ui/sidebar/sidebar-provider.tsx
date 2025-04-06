@@ -2,22 +2,7 @@ import * as React from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-
-const SIDEBAR_COOKIE_NAME = "sidebar:state";
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_KEYBOARD_SHORTCUT = "b";
-
-type SidebarContext = {
-  state: "expanded" | "collapsed";
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
-  toggleSidebar: () => void;
-};
-
-const SidebarContext = React.createContext<SidebarContext | null>(null);
+import { SidebarContext } from "./sidebar-context";
 
 export function useSidebar() {
   const context = React.useContext(SidebarContext);
@@ -65,7 +50,7 @@ export const SidebarProvider = React.forwardRef<
         }
 
         // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+        document.cookie = `sidebar:state=${openState}; path=/; max-age=${60 * 60 * 24 * 7}`;
       },
       [setOpenProp, open]
     );
@@ -81,7 +66,7 @@ export const SidebarProvider = React.forwardRef<
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
-          event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+          event.key === "b" &&
           (event.metaKey || event.ctrlKey)
         ) {
           event.preventDefault();
@@ -97,7 +82,7 @@ export const SidebarProvider = React.forwardRef<
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed";
 
-    const contextValue = React.useMemo<SidebarContext>(
+    const contextValue = React.useMemo<React.ContextType<typeof SidebarContext>>(
       () => ({
         state,
         open,

@@ -1,4 +1,5 @@
 
+export * from "./sidebar-context";
 export * from "./sidebar-provider";
 export * from "./sidebar-core";
 export * from "./sidebar-trigger";
