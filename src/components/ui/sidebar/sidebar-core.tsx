@@ -4,7 +4,7 @@ import { PanelLeft } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useSidebar } from "./sidebar-provider";
+import { useSidebar } from "./sidebar-context";
 
 // Constants
 const SIDEBAR_WIDTH = "16rem";
