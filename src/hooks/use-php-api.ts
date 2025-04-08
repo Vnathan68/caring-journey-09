@@ -1,5 +1,5 @@
 
-import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, UseQueryOptions, UseMutationOptions, QueryKey } from '@tanstack/react-query';
 import { apiService } from '@/services/api-service';
 import { toast } from '@/components/ui/use-toast';
 
@@ -9,9 +9,9 @@ import { toast } from '@/components/ui/use-toast';
 export function usePhpFetch<T>(
   endpoint: string,
   queryKey: string[],
-  options?: UseQueryOptions<T>
+  options?: Omit<UseQueryOptions<T, Error, T, QueryKey>, 'queryKey' | 'queryFn'>
 ) {
-  return useQuery<T>({
+  return useQuery<T, Error, T, QueryKey>({
     queryKey,
     queryFn: async () => apiService.get<T>(endpoint),
     ...options,
