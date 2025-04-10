@@ -3,11 +3,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreditCard, Download, FileText, Filter, Search } from 'lucide-react';
+import { FileText, Filter, Search, FileCheck, CalendarDays } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatDate } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useAuth } from '@/contexts/auth-context';
+import { ROLES } from '@/lib/utils';
 
 // Mock data for invoices
 const mockInvoices = [
@@ -20,6 +23,9 @@ const mockInvoices = [
     status: 'paid',
     insuranceCovered: 1200,
     patientResponsibility: 300,
+    paymentMethod: 'Cash',
+    recordedBy: 'Maria Lopez',
+    receiptNumber: 'REC-001-2023'
   },
   {
     id: 'INV-2023-002',
@@ -30,6 +36,9 @@ const mockInvoices = [
     status: 'paid',
     insuranceCovered: 2000,
     patientResponsibility: 500,
+    paymentMethod: 'Check',
+    recordedBy: 'Maria Lopez',
+    receiptNumber: 'REC-002-2023'
   },
   {
     id: 'INV-2023-003',
@@ -40,6 +49,9 @@ const mockInvoices = [
     status: 'pending',
     insuranceCovered: 2800,
     patientResponsibility: 400,
+    paymentMethod: '',
+    recordedBy: '',
+    receiptNumber: ''
   },
   {
     id: 'INV-2023-004',
@@ -50,6 +62,9 @@ const mockInvoices = [
     status: 'pending',
     insuranceCovered: 500,
     patientResponsibility: 300,
+    paymentMethod: '',
+    recordedBy: '',
+    receiptNumber: ''
   },
 ];
 
@@ -71,6 +86,14 @@ type InvoiceStatus = 'all' | 'paid' | 'pending';
 const BillingOverview: React.FC = () => {
   const [filter, setFilter] = useState<InvoiceStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showRecordPaymentForm, setShowRecordPaymentForm] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  // Check if user has permission to record payments
+  const canRecordPayments = user?.role === ROLES.ADMIN || 
+                            user?.role === ROLES.DOCTOR || 
+                            user?.role === ROLES.SECRETARY_NURSE;
 
   const filteredInvoices = mockInvoices.filter(invoice => {
     // Apply status filter
@@ -90,9 +113,78 @@ const BillingOverview: React.FC = () => {
     .filter(inv => inv.status === 'pending')
     .reduce((sum, inv) => sum + inv.patientResponsibility, 0);
 
+  const handleRecordPayment = (invoiceId: string) => {
+    setSelectedInvoice(invoiceId);
+    setShowRecordPaymentForm(true);
+  };
+
+  // Simplified payment recording form
+  const PaymentRecordingForm = () => {
+    const invoice = mockInvoices.find(inv => inv.id === selectedInvoice);
+    
+    if (!invoice) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <h3 className="text-lg font-semibold mb-4">Record Payment</h3>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Invoice</p>
+              <p className="font-medium">{invoice.id}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Service</p>
+              <p>{invoice.service}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Amount Due</p>
+              <p className="font-medium">₱{invoice.patientResponsibility.toLocaleString()}</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="paymentMethod">
+                Payment Method
+              </label>
+              <Select>
+                <SelectTrigger id="paymentMethod">
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="bankTransfer">Bank Transfer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="receiptNumber">
+                Receipt Number
+              </label>
+              <Input id="receiptNumber" placeholder="Enter receipt number" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="notes">
+                Notes
+              </label>
+              <Input id="notes" placeholder="Optional notes" />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setShowRecordPaymentForm(false)}>
+              Cancel
+            </Button>
+            <Button className="bg-clinic-600 hover:bg-clinic-700 text-white" onClick={() => setShowRecordPaymentForm(false)}>
+              Record Payment
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Current Balance</CardTitle>
@@ -104,11 +196,13 @@ const BillingOverview: React.FC = () => {
               From {mockInvoices.filter(inv => inv.status === 'pending').length} pending invoices
             </p>
           </CardContent>
-          <CardFooter>
-            <Button className="w-full bg-clinic-600 hover:bg-clinic-700 text-white">
-              Pay Now
-            </Button>
-          </CardFooter>
+          {canRecordPayments && (
+            <CardFooter>
+              <Button className="w-full bg-clinic-600 hover:bg-clinic-700 text-white">
+                Record Batch Payment
+              </Button>
+            </CardFooter>
+          )}
         </Card>
 
         <Card>
@@ -140,25 +234,6 @@ const BillingOverview: React.FC = () => {
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">View Insurance Details</Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Payment Methods</CardTitle>
-            <CardDescription>Manage your payment options</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3 p-3 border rounded-md">
-              <CreditCard className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">**** **** **** 5678</p>
-                <p className="text-xs text-muted-foreground">Expires 12/25</p>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" className="w-full">Add Payment Method</Button>
           </CardFooter>
         </Card>
       </div>
@@ -200,67 +275,76 @@ const BillingOverview: React.FC = () => {
             </div>
 
             <TabsContent value="invoices" className="mt-6">
-              <div className="rounded-md border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-slate-50">
-                      <th className="py-3 px-4 text-left font-medium">Invoice</th>
-                      <th className="py-3 px-4 text-left font-medium">Date</th>
-                      <th className="py-3 px-4 text-left font-medium">Service</th>
-                      <th className="py-3 px-4 text-left font-medium">Total</th>
-                      <th className="py-3 px-4 text-left font-medium">Your Cost</th>
-                      <th className="py-3 px-4 text-left font-medium">Status</th>
-                      <th className="py-3 px-4 text-right font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredInvoices.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="py-6 text-center text-muted-foreground">
-                          No invoices found
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredInvoices.map((invoice) => (
-                        <tr key={invoice.id} className="border-b">
-                          <td className="py-3 px-4">{invoice.id}</td>
-                          <td className="py-3 px-4">{formatDate(invoice.date)}</td>
-                          <td className="py-3 px-4">{invoice.service}</td>
-                          <td className="py-3 px-4">₱{invoice.amount.toLocaleString()}</td>
-                          <td className="py-3 px-4">₱{invoice.patientResponsibility.toLocaleString()}</td>
-                          <td className="py-3 px-4">
-                            <Badge 
-                              variant="outline" 
-                              className={
-                                invoice.status === 'paid'
-                                  ? 'bg-green-50 text-green-700 hover:bg-green-50'
-                                  : 'bg-amber-50 text-amber-700 hover:bg-amber-50'
-                              }
-                            >
-                              {invoice.status === 'paid' ? 'Paid' : 'Pending'}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="sm">
-                                <Download className="h-4 w-4" />
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Your Cost</TableHead>
+                    <TableHead>Status</TableHead>
+                    {canRecordPayments && <TableHead>Payment Method</TableHead>}
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInvoices.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={canRecordPayments ? 8 : 7} className="py-6 text-center text-muted-foreground">
+                        No invoices found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredInvoices.map((invoice) => (
+                      <TableRow key={invoice.id}>
+                        <TableCell>{invoice.id}</TableCell>
+                        <TableCell>{formatDate(invoice.date)}</TableCell>
+                        <TableCell>{invoice.service}</TableCell>
+                        <TableCell>₱{invoice.amount.toLocaleString()}</TableCell>
+                        <TableCell>₱{invoice.patientResponsibility.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant="outline" 
+                            className={
+                              invoice.status === 'paid'
+                                ? 'bg-green-50 text-green-700 hover:bg-green-50'
+                                : 'bg-amber-50 text-amber-700 hover:bg-amber-50'
+                            }
+                          >
+                            {invoice.status === 'paid' ? 'Paid' : 'Pending'}
+                          </Badge>
+                        </TableCell>
+                        {canRecordPayments && (
+                          <TableCell>{invoice.paymentMethod || '—'}</TableCell>
+                        )}
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm">
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                            {invoice.status === 'pending' && canRecordPayments ? (
+                              <Button 
+                                size="sm" 
+                                className="bg-clinic-600 hover:bg-clinic-700 text-white"
+                                onClick={() => handleRecordPayment(invoice.id)}
+                              >
+                                Record Payment
                               </Button>
+                            ) : (
                               <Button variant="outline" size="sm">
                                 View
                               </Button>
-                              {invoice.status === 'pending' && (
-                                <Button size="sm" className="bg-clinic-600 hover:bg-clinic-700 text-white">
-                                  Pay
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+
+              {showRecordPaymentForm && <PaymentRecordingForm />}
             </TabsContent>
 
             <TabsContent value="insurance" className="mt-6">
@@ -342,6 +426,31 @@ const BillingOverview: React.FC = () => {
           </Tabs>
         </CardHeader>
       </Card>
+      
+      {canRecordPayments && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Payment Reports</CardTitle>
+            <CardDescription>Generate financial reports</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-4">
+              <Button variant="outline" className="flex gap-2 items-center">
+                <FileCheck className="h-4 w-4" />
+                Revenue Report
+              </Button>
+              <Button variant="outline" className="flex gap-2 items-center">
+                <CalendarDays className="h-4 w-4" />
+                Payment History
+              </Button>
+              <Button variant="outline" className="flex gap-2 items-center">
+                <FileText className="h-4 w-4" />
+                Insurance Claims
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
