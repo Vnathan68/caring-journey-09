@@ -4,7 +4,7 @@
  */
 
 // Base URL for PHP backend (modify this to match your local PHP server)
-export const API_BASE_URL = 'http://localhost/api';
+export const API_BASE_URL = 'http://localhost/santa-matilda-api';
 
 // Default headers for API requests
 export const DEFAULT_HEADERS = {
