@@ -3,6 +3,7 @@ import React from 'react';
 import PageTransition from '@/components/ui-custom/page-transition';
 import HeroSection from '@/components/home/hero-section';
 import ServicesSection from '@/components/home/services-section';
+import ServicesGridSection from '@/components/home/services-grid-section';
 import StatsSection from '@/components/home/stats-section';
 import TestimonialsSection from '@/components/home/testimonials-section';
 import CTASection from '@/components/home/cta-section';
@@ -19,6 +20,7 @@ const Index: React.FC = () => {
       
       {/* Main page sections in logical order */}
       <HeroSection />
+      <ServicesGridSection />
       <ServicesSection />
       <StatsSection />
       <TestimonialsSection />
