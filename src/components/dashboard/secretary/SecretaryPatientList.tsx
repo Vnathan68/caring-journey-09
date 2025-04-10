@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Search, Plus, Filter, CalendarPlus, FileText, Phone, Mail } from 'lucide-react';
+import { useRegisterPatient, usePatientList, PatientData } from '@/hooks/use-patient-api';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PatientFormValues {
   firstName: string;
@@ -26,17 +27,6 @@ interface PatientFormValues {
   insuranceNumber: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-  lastVisit: string;
-  insuranceProvider: string;
-  status: 'active' | 'inactive' | 'pending';
 }
 
 const SecretaryPatientList: React.FC = () => {
@@ -58,6 +48,18 @@ const SecretaryPatientList: React.FC = () => {
     emergencyContactPhone: '',
   });
 
+  const { toast } = useToast();
+  const registerPatientMutation = useRegisterPatient();
+  const { data: patients = [], isLoading, isError } = usePatientList({
+    onError: (error) => {
+      toast({
+        title: "Error Loading Patients",
+        description: error.message || "Failed to load patient list",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormValues(prev => ({ ...prev, [name]: value }));
@@ -68,64 +70,52 @@ const SecretaryPatientList: React.FC = () => {
   };
 
   const handleRegisterPatient = () => {
-    // Logic to register patient - for now just close the dialog
-    setRegisterDialogOpen(false);
-    // In a real implementation, this would save the patient to the database
+    const patientData: Omit<PatientData, 'id'> = {
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      email: formValues.email,
+      phone: formValues.phone,
+      dateOfBirth: formValues.dateOfBirth,
+      address: formValues.address,
+      city: formValues.city,
+      state: formValues.state,
+      zipCode: formValues.zipCode,
+      insuranceProvider: formValues.insuranceProvider || undefined,
+      insuranceNumber: formValues.insuranceNumber || undefined,
+      emergencyContactName: formValues.emergencyContactName || undefined,
+      emergencyContactPhone: formValues.emergencyContactPhone || undefined
+    };
+
+    registerPatientMutation.mutate(patientData, {
+      onSuccess: () => {
+        setRegisterDialogOpen(false);
+        setFormValues({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          dateOfBirth: '',
+          address: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          insuranceProvider: '',
+          insuranceNumber: '',
+          emergencyContactName: '',
+          emergencyContactPhone: '',
+        });
+      }
+    });
   };
 
-  // Mock data for demonstration
-  const patients: Patient[] = [
-    {
-      id: 'pt-1',
-      name: 'Sofia Garcia',
-      email: 'sofia@example.com',
-      phone: '(555) 123-4567',
-      dateOfBirth: '1985-04-12',
-      lastVisit: '2025-03-15',
-      insuranceProvider: 'BlueCross',
-      status: 'active'
-    },
-    {
-      id: 'pt-2',
-      name: 'Elena Martinez',
-      email: 'elena@example.com',
-      phone: '(555) 234-5678',
-      dateOfBirth: '1990-08-22',
-      lastVisit: '2025-03-20',
-      insuranceProvider: 'Aetna',
-      status: 'active'
-    },
-    {
-      id: 'pt-3',
-      name: 'Ana Lopez',
-      email: 'ana@example.com',
-      phone: '(555) 345-6789',
-      dateOfBirth: '1982-11-05',
-      lastVisit: '2025-02-10',
-      insuranceProvider: 'United',
-      status: 'active'
-    },
-    {
-      id: 'pt-4',
-      name: 'Isabella Hernandez',
-      email: 'isabella@example.com',
-      phone: '(555) 456-7890',
-      dateOfBirth: '1995-07-18',
-      lastVisit: '2025-03-05',
-      insuranceProvider: 'Kaiser',
-      status: 'inactive'
-    },
-    {
-      id: 'pt-5',
-      name: 'Camila Gonzalez',
-      email: 'camila@example.com',
-      phone: '(555) 567-8901',
-      dateOfBirth: '1988-12-30',
-      lastVisit: '2025-01-25',
-      insuranceProvider: 'Medicare',
-      status: 'pending'
-    }
-  ];
+  const filteredPatients = patients.filter(patient => {
+    const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
+    return (
+      fullName.includes(searchQuery.toLowerCase()) ||
+      patient.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.phone.includes(searchQuery)
+    );
+  });
 
   const getStatusBadge = (status: 'active' | 'inactive' | 'pending') => {
     switch (status) {
@@ -386,7 +376,7 @@ const SecretaryPatientList: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {patients.map((patient) => (
+              {filteredPatients.map((patient) => (
                 <TableRow key={patient.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

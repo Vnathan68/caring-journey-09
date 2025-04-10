@@ -27,3 +27,15 @@ export const getRequestOptions = (method: string, data?: any) => {
 
   return options;
 };
+
+// Endpoints for patient management
+export const PATIENT_ENDPOINTS = {
+  REGISTER: '/patients/register',
+  UPDATE: '/patients/update',
+  GET_BY_ID: '/patients/get',
+  LIST: '/patients/list',
+  MEDICAL_HISTORY: '/patients/medical-history',
+  APPOINTMENTS: '/patients/appointments',
+  PREGNANCIES: '/patients/pregnancies',
+  DOCUMENTS: '/patients/documents',
+};
