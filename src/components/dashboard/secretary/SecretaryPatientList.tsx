@@ -1,56 +1,20 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, Plus, Filter, CalendarPlus, FileText, Phone, Mail } from 'lucide-react';
-import { useRegisterPatient, usePatientList, PatientData } from '@/hooks/use-patient-api';
+import { usePatientList, PatientData } from '@/hooks/use-patient-api';
 import { useToast } from '@/components/ui/use-toast';
-
-interface PatientFormValues {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  insuranceProvider: string;
-  insuranceNumber: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-}
+import PatientTable from './patient-list/PatientTable';
+import PatientRegistrationForm from './patient-list/PatientRegistrationForm';
+import PatientListToolbar from './patient-list/PatientListToolbar';
+import { Skeleton } from '@/components/ui/skeleton';
+import LoadingSpinner from '@/components/ui-custom/loading-spinner';
 
 const SecretaryPatientList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
-  const [formValues, setFormValues] = useState<PatientFormValues>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    insuranceProvider: '',
-    insuranceNumber: '',
-    emergencyContactName: '',
-    emergencyContactPhone: '',
-  });
 
   const { toast } = useToast();
-  const registerPatientMutation = useRegisterPatient();
   const { data: patients = [], isLoading, isError } = usePatientList({
     meta: {
       onError: (error) => {
@@ -63,54 +27,6 @@ const SecretaryPatientList: React.FC = () => {
     }
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleRegisterPatient = () => {
-    const patientData: Omit<PatientData, 'id'> = {
-      firstName: formValues.firstName,
-      lastName: formValues.lastName,
-      email: formValues.email,
-      phone: formValues.phone,
-      dateOfBirth: formValues.dateOfBirth,
-      address: formValues.address,
-      city: formValues.city,
-      state: formValues.state,
-      zipCode: formValues.zipCode,
-      insuranceProvider: formValues.insuranceProvider || undefined,
-      insuranceNumber: formValues.insuranceNumber || undefined,
-      emergencyContactName: formValues.emergencyContactName || undefined,
-      emergencyContactPhone: formValues.emergencyContactPhone || undefined
-    };
-
-    registerPatientMutation.mutate(patientData, {
-      onSuccess: () => {
-        setRegisterDialogOpen(false);
-        setFormValues({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          dateOfBirth: '',
-          address: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          insuranceProvider: '',
-          insuranceNumber: '',
-          emergencyContactName: '',
-          emergencyContactPhone: '',
-        });
-      }
-    });
-  };
-
   const filteredPatients = patients.filter(patient => {
     const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
     return (
@@ -120,247 +36,13 @@ const SecretaryPatientList: React.FC = () => {
     );
   });
 
-  const getStatusBadge = (status: 'active' | 'inactive' | 'pending' | undefined) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-50 text-green-600 border-green-200">Active</Badge>;
-      case 'inactive':
-        return <Badge className="bg-slate-100 text-slate-600 border-slate-200">Inactive</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-50 text-amber-600 border-amber-200">Pending</Badge>;
-      default:
-        return <Badge className="bg-slate-100 text-slate-600 border-slate-200">Unknown</Badge>;
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search patients..." 
-            className="pl-9" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            <span>Filter</span>
-          </Button>
-          
-          <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-clinic-600 hover:bg-clinic-700 text-white flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                <span>Register Patient</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Register New Patient</DialogTitle>
-              </DialogHeader>
-              
-              <div className="space-y-4 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={formValues.firstName}
-                      onChange={handleInputChange}
-                      placeholder="First name"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={formValues.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Last name"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formValues.email}
-                      onChange={handleInputChange}
-                      placeholder="Email address"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={formValues.phone}
-                      onChange={handleInputChange}
-                      placeholder="Phone number"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input
-                    id="dateOfBirth"
-                    name="dateOfBirth"
-                    type="date"
-                    value={formValues.dateOfBirth}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formValues.address}
-                    onChange={handleInputChange}
-                    placeholder="Street address"
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={formValues.city}
-                      onChange={handleInputChange}
-                      placeholder="City"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Select 
-                      onValueChange={(value) => handleSelectChange('state', value)}
-                      value={formValues.state}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="CA">California</SelectItem>
-                        <SelectItem value="NY">New York</SelectItem>
-                        <SelectItem value="TX">Texas</SelectItem>
-                        <SelectItem value="FL">Florida</SelectItem>
-                        <SelectItem value="IL">Illinois</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="zipCode">ZIP Code</Label>
-                    <Input
-                      id="zipCode"
-                      name="zipCode"
-                      value={formValues.zipCode}
-                      onChange={handleInputChange}
-                      placeholder="ZIP code"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                    <Select 
-                      onValueChange={(value) => handleSelectChange('insuranceProvider', value)}
-                      value={formValues.insuranceProvider}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select provider" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="BlueCross">BlueCross BlueShield</SelectItem>
-                        <SelectItem value="Aetna">Aetna</SelectItem>
-                        <SelectItem value="United">UnitedHealthcare</SelectItem>
-                        <SelectItem value="Kaiser">Kaiser Permanente</SelectItem>
-                        <SelectItem value="Medicare">Medicare</SelectItem>
-                        <SelectItem value="Medicaid">Medicaid</SelectItem>
-                        <SelectItem value="None">None/Self-Pay</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="insuranceNumber">Insurance Number</Label>
-                    <Input
-                      id="insuranceNumber"
-                      name="insuranceNumber"
-                      value={formValues.insuranceNumber}
-                      onChange={handleInputChange}
-                      placeholder="Insurance ID number"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContactName">Emergency Contact Name</Label>
-                    <Input
-                      id="emergencyContactName"
-                      name="emergencyContactName"
-                      value={formValues.emergencyContactName}
-                      onChange={handleInputChange}
-                      placeholder="Emergency contact name"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="emergencyContactPhone">Emergency Contact Phone</Label>
-                    <Input
-                      id="emergencyContactPhone"
-                      name="emergencyContactPhone"
-                      value={formValues.emergencyContactPhone}
-                      onChange={handleInputChange}
-                      placeholder="Emergency contact phone"
-                    />
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setRegisterDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button 
-                    className="bg-clinic-600 hover:bg-clinic-700 text-white"
-                    onClick={handleRegisterPatient}
-                  >
-                    Register Patient
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+      <PatientListToolbar 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onRegisterClick={() => setRegisterDialogOpen(true)}
+      />
       
       <Card>
         <CardHeader>
@@ -368,64 +50,23 @@ const SecretaryPatientList: React.FC = () => {
           <CardDescription>View and manage patient records</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Date of Birth</TableHead>
-                <TableHead>Insurance</TableHead>
-                <TableHead>Last Visit</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPatients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback className="bg-clinic-100 text-clinic-600">
-                          {`${patient.firstName.charAt(0)}${patient.lastName.charAt(0)}`}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{`${patient.firstName} ${patient.lastName}`}</div>
-                        <div className="text-xs text-muted-foreground">ID: {patient.id}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center text-sm">
-                        <Mail className="h-3 w-3 mr-1 text-muted-foreground" />
-                        {patient.email}
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <Phone className="h-3 w-3 mr-1 text-muted-foreground" />
-                        {patient.phone}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{patient.dateOfBirth}</TableCell>
-                  <TableCell>{patient.insuranceProvider}</TableCell>
-                  <TableCell>{patient.lastVisit}</TableCell>
-                  <TableCell>{getStatusBadge(patient.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="h-8 px-2">
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" className="h-8 px-2">
-                        <CalendarPlus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {isLoading ? (
+            <div className="flex flex-col space-y-3">
+              <div className="flex justify-center my-8">
+                <LoadingSpinner size="lg" color="primary" />
+              </div>
+            </div>
+          ) : isError ? (
+            <div className="text-center p-4 text-destructive">
+              Error loading patient data. Please try again later.
+            </div>
+          ) : filteredPatients.length === 0 ? (
+            <div className="text-center p-4 text-muted-foreground">
+              No patients found matching your search criteria.
+            </div>
+          ) : (
+            <PatientTable patients={filteredPatients} />
+          )}
           
           <div className="mt-4">
             <Pagination>
@@ -453,6 +94,11 @@ const SecretaryPatientList: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      
+      <PatientRegistrationForm 
+        isOpen={registerDialogOpen} 
+        onClose={() => setRegisterDialogOpen(false)} 
+      />
     </div>
   );
 };
