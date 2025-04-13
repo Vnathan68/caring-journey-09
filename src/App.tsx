@@ -29,55 +29,65 @@ import ObstetricsService from './pages/services/ObstetricsService';
 import GynecologyService from './pages/services/GynecologyService';
 import FamilyPlanningService from './pages/services/FamilyPlanningService';
 import UsersPage from './pages/dashboard/UsersPage';
+import ApiTestPage from './pages/api-test';
 import { Toaster } from './components/ui/toaster';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a client
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Index />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="services/obstetrics" element={<ObstetricsService />} />
-            <Route path="services/gynecology" element={<GynecologyService />} />
-            <Route path="services/family-planning" element={<FamilyPlanningService />} />
-          </Route>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Index />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="services/obstetrics" element={<ObstetricsService />} />
+              <Route path="services/gynecology" element={<GynecologyService />} />
+              <Route path="services/family-planning" element={<FamilyPlanningService />} />
+            </Route>
+            
+            {/* API Test Page */}
+            <Route path="api-test" element={<ApiTestPage />} />
+            
+            {/* Auth Routes */}
+            <Route path="login" element={<Login />} />
+            <Route path="signup" element={<Signup />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            
+            {/* Dashboard Routes */}
+            <Route path="dashboard" element={<DashboardLayout />}>
+              <Route index element={<DoctorDashboard />} />
+              <Route path="patient" element={<PatientDashboard />} />
+              <Route path="secretary" element={<SecretaryDashboard />} />
+              <Route path="admin" element={<AdminDashboard />} />
+              <Route path="messages" element={<MessagesPage />} />
+              <Route path="appointments" element={<AppointmentsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="records" element={<RecordsPage />} />
+              <Route path="pregnancy" element={<PregnancyPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="patients" element={<PatientsPage />} />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="telemedicine" element={<TelemedicinePage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
+            </Route>
+            
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           
-          {/* Auth Routes */}
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-          <Route path="forgot-password" element={<ForgotPassword />} />
-          
-          {/* Dashboard Routes */}
-          <Route path="dashboard" element={<DashboardLayout />}>
-            <Route index element={<DoctorDashboard />} />
-            <Route path="patient" element={<PatientDashboard />} />
-            <Route path="secretary" element={<SecretaryDashboard />} />
-            <Route path="admin" element={<AdminDashboard />} />
-            <Route path="messages" element={<MessagesPage />} />
-            <Route path="appointments" element={<AppointmentsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="payments" element={<PaymentsPage />} />
-            <Route path="records" element={<RecordsPage />} />
-            <Route path="pregnancy" element={<PregnancyPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="patients" element={<PatientsPage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="telemedicine" element={<TelemedicinePage />} />
-            <Route path="announcements" element={<AnnouncementsPage />} />
-          </Route>
-          
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        <Toaster />
-      </AuthProvider>
-    </Router>
+          <Toaster />
+        </AuthProvider>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
