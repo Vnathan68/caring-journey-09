@@ -50,3 +50,22 @@ export const DOCTOR_ENDPOINTS = {
   PATIENTS: '/doctors/patients',
   AVAILABILITY: '/doctors/availability',
 };
+
+// Endpoints for secretary/nurse management
+export const SECRETARY_NURSE_ENDPOINTS = {
+  REGISTER: '/secretary-nurses/register',
+  UPDATE: '/secretary-nurses/update',
+  GET_BY_ID: '/secretary-nurses/get',
+  LIST: '/secretary-nurses/list',
+  SCHEDULE: '/secretary-nurses/schedule',
+};
+
+// Endpoints for admin management
+export const ADMIN_ENDPOINTS = {
+  REGISTER: '/admins/register',
+  UPDATE: '/admins/update',
+  GET_BY_ID: '/admins/get',
+  LIST: '/admins/list',
+  SYSTEM_LOGS: '/admins/logs',
+  DASHBOARD_STATS: '/admins/stats',
+};
