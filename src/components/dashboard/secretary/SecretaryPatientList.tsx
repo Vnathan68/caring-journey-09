@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -51,12 +52,14 @@ const SecretaryPatientList: React.FC = () => {
   const { toast } = useToast();
   const registerPatientMutation = useRegisterPatient();
   const { data: patients = [], isLoading, isError } = usePatientList({
-    onError: (error) => {
-      toast({
-        title: "Error Loading Patients",
-        description: error.message || "Failed to load patient list",
-        variant: "destructive"
-      });
+    meta: {
+      onError: (error) => {
+        toast({
+          title: "Error Loading Patients",
+          description: error.message || "Failed to load patient list",
+          variant: "destructive"
+        });
+      }
     }
   });
 
@@ -117,7 +120,7 @@ const SecretaryPatientList: React.FC = () => {
     );
   });
 
-  const getStatusBadge = (status: 'active' | 'inactive' | 'pending') => {
+  const getStatusBadge = (status: 'active' | 'inactive' | 'pending' | undefined) => {
     switch (status) {
       case 'active':
         return <Badge className="bg-green-50 text-green-600 border-green-200">Active</Badge>;
@@ -125,6 +128,8 @@ const SecretaryPatientList: React.FC = () => {
         return <Badge className="bg-slate-100 text-slate-600 border-slate-200">Inactive</Badge>;
       case 'pending':
         return <Badge className="bg-amber-50 text-amber-600 border-amber-200">Pending</Badge>;
+      default:
+        return <Badge className="bg-slate-100 text-slate-600 border-slate-200">Unknown</Badge>;
     }
   };
 
@@ -382,11 +387,11 @@ const SecretaryPatientList: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarFallback className="bg-clinic-100 text-clinic-600">
-                          {patient.name.charAt(0)}
+                          {`${patient.firstName.charAt(0)}${patient.lastName.charAt(0)}`}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{patient.name}</div>
+                        <div className="font-medium">{`${patient.firstName} ${patient.lastName}`}</div>
                         <div className="text-xs text-muted-foreground">ID: {patient.id}</div>
                       </div>
                     </div>

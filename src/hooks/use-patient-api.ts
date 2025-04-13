@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions, QueryKey } from '@tanstack/react-query';
 import { apiService } from '@/services/api-service';
 import { toast } from '@/components/ui/use-toast';
@@ -8,6 +7,7 @@ export interface PatientData {
   id?: string;
   firstName: string;
   lastName: string;
+  name?: string;
   email: string;
   phone: string;
   dateOfBirth: string;
@@ -21,6 +21,8 @@ export interface PatientData {
   emergencyContactPhone?: string;
   medicalHistory?: MedicalHistoryItem[];
   pregnancyData?: PregnancyData;
+  lastVisit?: string;
+  status?: 'active' | 'inactive' | 'pending';
 }
 
 export interface MedicalHistoryItem {
@@ -106,7 +108,7 @@ export function usePatientData(
 /**
  * Hook for fetching patient list (for admin/doctor/secretary)
  */
-export function usePatientList(options?: UseQueryOptions<PatientData[], Error, PatientData[], QueryKey>) {
+export function usePatientList(options?: Omit<UseQueryOptions<PatientData[], Error, PatientData[], QueryKey>, 'queryKey' | 'queryFn'>) {
   return useQuery<PatientData[], Error, PatientData[]>({
     queryKey: ['patients'],
     queryFn: async () => apiService.get<PatientData[]>(PATIENT_ENDPOINTS.LIST),
