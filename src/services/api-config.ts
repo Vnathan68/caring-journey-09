@@ -39,3 +39,14 @@ export const PATIENT_ENDPOINTS = {
   PREGNANCIES: '/patients/pregnancies',
   DOCUMENTS: '/patients/documents',
 };
+
+// Endpoints for doctor management
+export const DOCTOR_ENDPOINTS = {
+  REGISTER: '/doctors/register',
+  UPDATE: '/doctors/update',
+  GET_BY_ID: '/doctors/get',
+  LIST: '/doctors/list',
+  SCHEDULE: '/doctors/schedule',
+  PATIENTS: '/doctors/patients',
+  AVAILABILITY: '/doctors/availability',
+};
