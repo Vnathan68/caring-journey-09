@@ -69,3 +69,15 @@ export const ADMIN_ENDPOINTS = {
   SYSTEM_LOGS: '/admins/logs',
   DASHBOARD_STATS: '/admins/stats',
 };
+
+// Auth endpoints
+export const AUTH_ENDPOINTS = {
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
+  VERIFY_2FA: '/auth/verify-2fa',
+  RESET_PASSWORD: '/auth/reset-password',
+  CHANGE_PASSWORD: '/auth/change-password',
+  ENABLE_2FA: '/auth/enable-2fa',
+  DISABLE_2FA: '/auth/disable-2fa',
+  LOGOUT: '/auth/logout',
+};
