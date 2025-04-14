@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import GlassCard from '@/components/ui-custom/glass-card';
 import PageTransition from '@/components/ui-custom/page-transition';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2 } from 'lucide-react';
 
 const Signup: React.FC = () => {
@@ -17,17 +17,26 @@ const Signup: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !email || !password) {
-      toast.error('Please fill in all fields');
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
       return;
     }
     
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -41,7 +50,11 @@ const Signup: React.FC = () => {
         // Default role is patient, set in auth-context
       });
       
-      toast.success('Account created successfully');
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+        variant: "success"
+      });
       
       // Navigate based on role
       if (user.role === 'patient') {
@@ -50,7 +63,11 @@ const Signup: React.FC = () => {
         navigate('/dashboard', { replace: true });
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Sign up failed');
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Sign up failed',
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }

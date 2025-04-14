@@ -42,7 +42,12 @@ class AuthService {
         };
       }
       
-      return response;
+      return {
+        status: response.status,
+        data: response.data?.data,
+        message: response.message,
+        needsTwoFactor: false
+      };
     } catch (error) {
       console.error('Login API call failed:', error);
       
@@ -76,7 +81,13 @@ class AuthService {
   async verifyTwoFactorCode(code: string): Promise<TwoFactorVerifyResponse> {
     try {
       // Use the actual API endpoint for 2FA verification
-      return await apiService.post<TwoFactorVerifyResponse>('auth/verify-2fa', { code });
+      const response = await apiService.post<TwoFactorVerifyResponse>('auth/verify-2fa', { code });
+      
+      return {
+        status: response.status,
+        data: response.data?.data,
+        message: response.message
+      };
     } catch (error) {
       console.error('2FA verification API call failed:', error);
       

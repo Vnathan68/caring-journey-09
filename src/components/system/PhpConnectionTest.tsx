@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import apiService from '@/services/api-service';
+import apiService, { ApiResponse } from '@/services/api-service';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/ui-custom/loading-spinner';
 
@@ -17,12 +17,22 @@ const PhpConnectionTest = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [response, setResponse] = useState<ConnectionResponse | null>(null);
+  const { toast } = useToast();
 
   const testConnection = async () => {
     setIsLoading(true);
     try {
-      const result = await apiService.get<ConnectionResponse>('index');
-      setResponse(result);
+      const result = await apiService.get<ApiResponse<ConnectionResponse>>('index');
+      
+      // Create a proper response object that satisfies the ConnectionResponse interface
+      const connectionResponse: ConnectionResponse = {
+        status: result.status,
+        message: result.message || 'API is running', // Ensure message is not undefined
+        version: result.data?.version,
+        timestamp: result.data?.timestamp
+      };
+      
+      setResponse(connectionResponse);
       setConnectionStatus('success');
       toast({
         title: 'Connection Successful',

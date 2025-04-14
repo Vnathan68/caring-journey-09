@@ -1,6 +1,7 @@
+
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions, QueryKey } from '@tanstack/react-query';
-import { apiService } from '@/services/api-service';
-import { toast } from '@/components/ui/use-toast';
+import apiService from '@/services/api-service';
+import { toast } from '@/hooks/use-toast';
 import { PATIENT_ENDPOINTS } from '@/services/api-config';
 
 export interface PatientData {
@@ -48,7 +49,10 @@ export interface PregnancyData {
  */
 export function useRegisterPatient() {
   return useMutation<PatientData, Error, Omit<PatientData, 'id'>>({
-    mutationFn: (patientData) => apiService.post<PatientData>(PATIENT_ENDPOINTS.REGISTER, patientData),
+    mutationFn: async (patientData) => {
+      const response = await apiService.post<PatientData>(PATIENT_ENDPOINTS.REGISTER, patientData);
+      return response.data as PatientData;
+    },
     onSuccess: () => {
       toast({
         title: "Patient Registered",
@@ -70,7 +74,10 @@ export function useRegisterPatient() {
  */
 export function useUpdatePatient() {
   return useMutation<PatientData, Error, PatientData>({
-    mutationFn: (patientData) => apiService.put<PatientData>(PATIENT_ENDPOINTS.UPDATE, patientData),
+    mutationFn: async (patientData) => {
+      const response = await apiService.put<PatientData>(PATIENT_ENDPOINTS.UPDATE, patientData);
+      return response.data as PatientData;
+    },
     onSuccess: () => {
       toast({
         title: "Patient Updated",
@@ -94,11 +101,12 @@ export function usePatientData(
   patientId?: string,
   options?: UseQueryOptions<PatientData, Error, PatientData, QueryKey>
 ) {
-  return useQuery<PatientData, Error, PatientData>({
+  return useQuery<PatientData, Error>({
     queryKey: ['patient', patientId],
     queryFn: async () => {
       if (!patientId) throw new Error('Patient ID is required');
-      return apiService.get<PatientData>(`${PATIENT_ENDPOINTS.GET_BY_ID}/${patientId}`);
+      const response = await apiService.get<PatientData>(`${PATIENT_ENDPOINTS.GET_BY_ID}/${patientId}`);
+      return response.data as PatientData;
     },
     enabled: !!patientId,
     ...options,
@@ -109,9 +117,12 @@ export function usePatientData(
  * Hook for fetching patient list (for admin/doctor/secretary)
  */
 export function usePatientList(options?: Omit<UseQueryOptions<PatientData[], Error, PatientData[], QueryKey>, 'queryKey' | 'queryFn'>) {
-  return useQuery<PatientData[], Error, PatientData[]>({
+  return useQuery<PatientData[], Error>({
     queryKey: ['patients'],
-    queryFn: async () => apiService.get<PatientData[]>(PATIENT_ENDPOINTS.LIST),
+    queryFn: async () => {
+      const response = await apiService.get<PatientData[]>(PATIENT_ENDPOINTS.LIST);
+      return response.data as PatientData[];
+    },
     ...options,
   });
 }
@@ -121,8 +132,10 @@ export function usePatientList(options?: Omit<UseQueryOptions<PatientData[], Err
  */
 export function useUpdateMedicalHistory() {
   return useMutation<MedicalHistoryItem[], Error, { patientId: string, medicalHistory: MedicalHistoryItem[] }>({
-    mutationFn: ({ patientId, medicalHistory }) => 
-      apiService.put<MedicalHistoryItem[]>(`${PATIENT_ENDPOINTS.MEDICAL_HISTORY}/${patientId}`, { medicalHistory }),
+    mutationFn: async ({ patientId, medicalHistory }) => {
+      const response = await apiService.put<MedicalHistoryItem[]>(`${PATIENT_ENDPOINTS.MEDICAL_HISTORY}/${patientId}`, { medicalHistory });
+      return response.data as MedicalHistoryItem[];
+    },
     onSuccess: () => {
       toast({
         title: "Medical History Updated",
@@ -144,8 +157,10 @@ export function useUpdateMedicalHistory() {
  */
 export function useUpdatePregnancyData() {
   return useMutation<PregnancyData, Error, { patientId: string, pregnancyData: PregnancyData }>({
-    mutationFn: ({ patientId, pregnancyData }) => 
-      apiService.put<PregnancyData>(`${PATIENT_ENDPOINTS.PREGNANCIES}/${patientId}`, { pregnancyData }),
+    mutationFn: async ({ patientId, pregnancyData }) => {
+      const response = await apiService.put<PregnancyData>(`${PATIENT_ENDPOINTS.PREGNANCIES}/${patientId}`, { pregnancyData });
+      return response.data as PregnancyData;
+    },
     onSuccess: () => {
       toast({
         title: "Pregnancy Data Updated",

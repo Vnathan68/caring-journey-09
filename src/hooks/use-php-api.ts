@@ -11,9 +11,13 @@ export function usePhpFetch<T>(
   queryKey: string[],
   options?: Omit<UseQueryOptions<T, Error, T, QueryKey>, 'queryKey' | 'queryFn'>
 ) {
-  return useQuery<T, Error, T, QueryKey>({
+  return useQuery<T, Error>({
     queryKey,
-    queryFn: async () => apiService.get<T>(endpoint),
+    queryFn: async () => {
+      const response = await apiService.get<T>(endpoint);
+      // Return the data property directly as T
+      return response.data as T;
+    },
     ...options,
   });
 }
@@ -26,7 +30,10 @@ export function usePhpPost<T, TData = any>(
   options?: UseMutationOptions<T, Error, TData>
 ) {
   return useMutation<T, Error, TData>({
-    mutationFn: (data: TData) => apiService.post<T>(endpoint, data),
+    mutationFn: async (data: TData) => {
+      const response = await apiService.post<T>(endpoint, data);
+      return response.data as T;
+    },
     onError: (error) => {
       toast({
         title: "Error",
@@ -46,7 +53,10 @@ export function usePhpUpdate<T, TData = any>(
   options?: UseMutationOptions<T, Error, TData>
 ) {
   return useMutation<T, Error, TData>({
-    mutationFn: (data: TData) => apiService.put<T>(endpoint, data),
+    mutationFn: async (data: TData) => {
+      const response = await apiService.put<T>(endpoint, data);
+      return response.data as T;
+    },
     onError: (error) => {
       toast({
         title: "Error",
@@ -66,7 +76,10 @@ export function usePhpDelete<T>(
   options?: UseMutationOptions<T, Error, string>
 ) {
   return useMutation<T, Error, string>({
-    mutationFn: (id: string) => apiService.delete<T>(`${endpoint}/${id}`),
+    mutationFn: async (id: string) => {
+      const response = await apiService.delete<T>(`${endpoint}/${id}`);
+      return response.data as T;
+    },
     onError: (error) => {
       toast({
         title: "Error",
