@@ -24,12 +24,12 @@ class ApiService {
    * Normalize the URL by ensuring we don't have double slashes
    */
   private normalizeUrl(endpoint: string): string {
-    // Ensure the endpoint starts with a single slash
+    // Remove leading slash from endpoint if it exists
     const normalizedEndpoint = endpoint.startsWith('/')
-      ? endpoint
-      : `/${endpoint}`;
+      ? endpoint.slice(1)
+      : endpoint;
 
-    return `${API_BASE_URL}${normalizedEndpoint}`;
+    return `${API_BASE_URL}/${normalizedEndpoint}`;
   }
 
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
@@ -102,3 +102,5 @@ class ApiService {
 // Create and export a singleton instance
 const apiService = ApiService.getInstance();
 export default apiService;
+// Also export type for use in other files
+export type { ApiResponse };

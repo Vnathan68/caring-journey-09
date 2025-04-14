@@ -1,28 +1,42 @@
 
-import { toast as sonnerToast, type Toast } from "@/components/ui/sonner"
+import { toast as sonnerToast } from "sonner";
 
-type ToastProps = Toast & {
-  variant?: "default" | "destructive" | "success" | "warning" | "info"
+type ToastProps = {
+  title?: string;
+  description?: string;
+  variant?: "default" | "destructive" | "success" | "warning" | "info";
 };
 
 export function toast(props: ToastProps) {
-  const { variant = "default", ...rest } = props
+  const { variant = "default", title, description } = props;
 
   if (variant === "destructive") {
-    return sonnerToast.error(rest.title, {
-      ...rest,
-    })
+    return sonnerToast.error(title, {
+      description,
+    });
   }
 
   if (variant === "success") {
-    return sonnerToast.success(rest.title, {
-      ...rest,
-    })
+    return sonnerToast.success(title, {
+      description,
+    });
   }
 
-  return sonnerToast(rest.title, {
-    ...rest,
-  })
+  if (variant === "warning") {
+    return sonnerToast.warning(title, {
+      description,
+    });
+  }
+
+  if (variant === "info") {
+    return sonnerToast.info(title, {
+      description,
+    });
+  }
+
+  return sonnerToast(title || "", {
+    description,
+  });
 }
 
 toast.success = (message: string) => {

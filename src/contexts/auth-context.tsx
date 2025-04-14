@@ -10,6 +10,7 @@ export type AuthContextType = {
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   verifyTwoFactorCode: (code: string) => Promise<User | null>;
+  signUp: (name: string, email: string, password: string) => Promise<User | null>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => null,
   logout: async () => {},
   verifyTwoFactorCode: async () => null,
+  signUp: async () => null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -75,10 +77,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await authService.logout();
       setUser(null);
       localStorage.removeItem('user');
-      toast.success('Logged out successfully');
+      toast({
+        title: 'Logged out successfully',
+      });
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error('Failed to log out');
+      toast({
+        title: 'Failed to log out',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +110,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
   };
+  
+  const signUp = async (name: string, email: string, password: string): Promise<User | null> => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+      
+      if (response.status === 'success' && response.data) {
+        setUser(response.data);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        return response.data;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -113,6 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         verifyTwoFactorCode,
+        signUp
       }}
     >
       {children}

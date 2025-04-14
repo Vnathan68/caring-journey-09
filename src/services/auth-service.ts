@@ -1,5 +1,5 @@
 
-import apiService from './api-service';
+import apiService, { ApiResponse } from './api-service';
 
 export interface LoginCredentials {
   email: string;
@@ -28,12 +28,70 @@ export interface TwoFactorVerifyResponse {
 }
 
 class AuthService {
-  // In production, this would use the real API
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    // For development, let's use mock responses due to CORS issues
-    // In production, you'd uncomment this:
-    // return apiService.post<User>('/auth/login', credentials);
-    
+    try {
+      // Use the actual API endpoint for login
+      const response = await apiService.post<LoginResponse>('auth/login', credentials);
+      
+      // Check for two-factor authentication requirement
+      if (response.status === 'two_factor_required') {
+        return {
+          status: 'two_factor_required',
+          needsTwoFactor: true,
+          message: 'Two-factor authentication required'
+        };
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Login API call failed:', error);
+      
+      // If the API is unreachable, fall back to mock service for development
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('API unreachable. Falling back to mock authentication service.');
+        return this.mockLogin(credentials);
+      }
+      
+      throw error;
+    }
+  }
+
+  async logout(): Promise<ApiResponse<any>> {
+    try {
+      // Use the actual API endpoint for logout
+      return await apiService.post('auth/logout', {});
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+      
+      // If the API is unreachable, fall back to mock service for development
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('API unreachable. Falling back to mock authentication service.');
+        return this.mockLogout();
+      }
+      
+      throw error;
+    }
+  }
+
+  async verifyTwoFactorCode(code: string): Promise<TwoFactorVerifyResponse> {
+    try {
+      // Use the actual API endpoint for 2FA verification
+      return await apiService.post<TwoFactorVerifyResponse>('auth/verify-2fa', { code });
+    } catch (error) {
+      console.error('2FA verification API call failed:', error);
+      
+      // If the API is unreachable, fall back to mock service for development
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('API unreachable. Falling back to mock authentication service.');
+        return this.mockVerifyTwoFactorCode(code);
+      }
+      
+      throw error;
+    }
+  }
+  
+  // Mock implementations for development when API is unreachable
+  private mockLogin(credentials: LoginCredentials): Promise<LoginResponse> {
     console.log('Using mock auth service - login attempt for:', credentials.email);
     
     // Mock response based on credentials
@@ -89,28 +147,16 @@ class AuthService {
     });
   }
 
-  async logout(): Promise<{ status: string; message: string }> {
-    // For development, let's use a mock response
-    // In production, you'd use:
-    // return apiService.post('/auth/logout', {});
-    
+  private mockLogout(): Promise<ApiResponse<any>> {
     console.log('Using mock auth service - logout');
     
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          status: 'success',
-          message: 'Logged out successfully',
-        });
-      }, 300);
+    return Promise.resolve({
+      status: 'success',
+      message: 'Logged out successfully',
     });
   }
 
-  async verifyTwoFactorCode(code: string): Promise<TwoFactorVerifyResponse> {
-    // For development, let's use a mock response
-    // In production, you'd use:
-    // return apiService.post('/auth/verify-2fa', { code });
-    
+  private mockVerifyTwoFactorCode(code: string): Promise<TwoFactorVerifyResponse> {
     console.log('Using mock auth service - 2FA verify:', code);
     
     return new Promise((resolve, reject) => {

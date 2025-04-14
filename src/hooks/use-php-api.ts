@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions, QueryKey } from '@tanstack/react-query';
-import { apiService } from '@/services/api-service';
-import { toast } from '@/components/ui/use-toast';
+import apiService from '@/services/api-service';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * Hook for fetching data from the PHP backend

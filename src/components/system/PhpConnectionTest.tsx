@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { apiService } from '@/services/api-service';
-import { toast } from '@/components/ui/use-toast';
+import apiService from '@/services/api-service';
+import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/ui-custom/loading-spinner';
 
 interface ConnectionResponse {
