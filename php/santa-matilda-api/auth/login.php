@@ -6,6 +6,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 
+// Handle OPTIONS request for CORS preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
 // Include database connection file
 include_once '../config/database.php';
 
@@ -57,15 +62,14 @@ try {
         if (password_verify($password, $user['password'])) {
             // Start session
             session_start();
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_role'] = $user['role'];
             
             // Check if two factor authentication is required
             $needsTwoFactor = (bool)$user['two_factor_enabled'];
             
             if ($needsTwoFactor) {
                 // In a real app, you would generate and send a 2FA code here
-                // For this example, we'll just simulate the 2FA requirement
+                // For this example, we'll store user ID in session as pending
+                $_SESSION['pending_user_id'] = $user['id'];
                 
                 echo json_encode([
                     'status' => 'two_factor_required',
@@ -74,6 +78,10 @@ try {
                 ]);
                 exit;
             }
+            
+            // Set session variables to indicate the user is logged in
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_role'] = $user['role'];
             
             // Update last login time based on user role
             if ($user['role'] === 'admin') {
@@ -115,3 +123,4 @@ try {
         'message' => 'Database error: ' . $e->getMessage()
     ]);
 }
+?>

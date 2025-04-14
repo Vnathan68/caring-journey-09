@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GlassCard from '@/components/ui-custom/glass-card';
 import PageTransition from '@/components/ui-custom/page-transition';
 import LoginForm from '@/components/auth/LoginForm';
@@ -16,8 +15,15 @@ const Login: React.FC = () => {
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { verifyTwoFactorCode } = useAuth();
+  const { verifyTwoFactorCode, needsTwoFactor } = useAuth();
   const navigate = useNavigate();
+  
+  // Show two-factor form if needed based on context state
+  React.useEffect(() => {
+    if (needsTwoFactor) {
+      setShowTwoFactor(true);
+    }
+  }, [needsTwoFactor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,28 +36,33 @@ const Login: React.FC = () => {
         
         // Redirect based on user role after 2FA verification
         if (user) {
-          switch(user.role) {
-            case ROLES.ADMIN:
-              navigate('/dashboard/admin', { replace: true });
-              break;
-            case ROLES.DOCTOR:
-              navigate('/dashboard', { replace: true });
-              break;
-            case ROLES.PATIENT:
-              navigate('/dashboard/patient', { replace: true });
-              break;
-            case ROLES.SECRETARY_NURSE:
-              navigate('/dashboard/secretary', { replace: true });
-              break;
-            default:
-              navigate('/dashboard', { replace: true });
-          }
+          redirectBasedOnRole(user.role);
         }
       } 
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Verification failed');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+  
+  // Helper function to redirect based on user role
+  const redirectBasedOnRole = (role: string) => {
+    switch(role) {
+      case ROLES.ADMIN:
+        navigate('/dashboard/admin', { replace: true });
+        break;
+      case ROLES.DOCTOR:
+        navigate('/dashboard', { replace: true });
+        break;
+      case ROLES.PATIENT:
+        navigate('/dashboard/patient', { replace: true });
+        break;
+      case ROLES.SECRETARY_NURSE:
+        navigate('/dashboard/secretary', { replace: true });
+        break;
+      default:
+        navigate('/dashboard', { replace: true });
     }
   };
 

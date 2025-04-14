@@ -4,6 +4,15 @@ import { User } from '@/types/auth-types';
 import { AUTH_ENDPOINTS } from './api-config';
 
 /**
+ * Response structure from the PHP backend
+ */
+interface PhpResponse<T> {
+  status: string;
+  message?: string;
+  data?: T;
+}
+
+/**
  * Service for authentication-related API calls to PHP backend
  */
 export const authService = {
@@ -13,8 +22,8 @@ export const authService = {
    * @param password - User password
    * @returns Promise with user data
    */
-  login: async (email: string, password: string): Promise<User> => {
-    return apiService.post<User>(AUTH_ENDPOINTS.LOGIN, { email, password });
+  login: async (email: string, password: string): Promise<PhpResponse<User>> => {
+    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.LOGIN, { email, password });
   },
 
   /**
@@ -27,8 +36,8 @@ export const authService = {
     password: string;
     name: string;
     role?: string;
-  }): Promise<User> => {
-    return apiService.post<User>(AUTH_ENDPOINTS.REGISTER, userData);
+  }): Promise<PhpResponse<User>> => {
+    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.REGISTER, userData);
   },
 
   /**
@@ -36,16 +45,16 @@ export const authService = {
    * @param code - 2FA code
    * @returns Promise with user data
    */
-  verifyTwoFactor: async (code: string): Promise<User> => {
-    return apiService.post<User>(AUTH_ENDPOINTS.VERIFY_2FA, { code });
+  verifyTwoFactor: async (code: string): Promise<PhpResponse<User>> => {
+    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.VERIFY_2FA, { code });
   },
 
   /**
    * Request password reset
    * @param email - User email
    */
-  resetPassword: async (email: string): Promise<void> => {
-    return apiService.post<void>(AUTH_ENDPOINTS.RESET_PASSWORD, { email });
+  resetPassword: async (email: string): Promise<PhpResponse<void>> => {
+    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.RESET_PASSWORD, { email });
   },
 
   /**
@@ -53,28 +62,28 @@ export const authService = {
    * @param currentPassword - Current password
    * @param newPassword - New password
    */
-  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
-    return apiService.post<void>(AUTH_ENDPOINTS.CHANGE_PASSWORD, { currentPassword, newPassword });
+  changePassword: async (currentPassword: string, newPassword: string): Promise<PhpResponse<void>> => {
+    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.CHANGE_PASSWORD, { currentPassword, newPassword });
   },
 
   /**
    * Enable two-factor authentication
    */
-  enableTwoFactor: async (): Promise<void> => {
-    return apiService.post<void>(AUTH_ENDPOINTS.ENABLE_2FA, {});
+  enableTwoFactor: async (): Promise<PhpResponse<void>> => {
+    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.ENABLE_2FA, {});
   },
 
   /**
    * Disable two-factor authentication
    */
-  disableTwoFactor: async (): Promise<void> => {
-    return apiService.post<void>(AUTH_ENDPOINTS.DISABLE_2FA, {});
+  disableTwoFactor: async (): Promise<PhpResponse<void>> => {
+    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.DISABLE_2FA, {});
   },
 
   /**
    * Logout user
    */
-  logout: async (): Promise<void> => {
-    return apiService.post<void>(AUTH_ENDPOINTS.LOGOUT, {});
+  logout: async (): Promise<PhpResponse<void>> => {
+    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.LOGOUT, {});
   },
 };

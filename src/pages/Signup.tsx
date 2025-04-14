@@ -34,14 +34,21 @@ const Signup: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      await signUp({
+      const user = await signUp({
         name,
         email,
         password,
         // Default role is patient, set in auth-context
       });
+      
       toast.success('Account created successfully');
-      navigate('/dashboard');
+      
+      // Navigate based on role
+      if (user.role === 'patient') {
+        navigate('/dashboard/patient', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Sign up failed');
     } finally {
