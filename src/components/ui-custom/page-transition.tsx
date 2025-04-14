@@ -1,13 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PageTransitionProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-const PageTransition = ({ children, className }: PageTransitionProps) => {
+const PageTransition: React.FC<PageTransitionProps> = ({ children, className }: PageTransitionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
