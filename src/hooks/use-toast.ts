@@ -74,16 +74,10 @@ export const useToast = () => {
       }
     };
     
-    // Use the listener API if it exists, otherwise we'll use our mock state
-    const cleanup = typeof sonnerToast.listen === 'function' 
-      ? sonnerToast.listen(handleToastChange) 
-      : () => {};
+    // Use a simple mock implementation since sonnerToast.listen is not available
+    const cleanup = () => {};
     
-    return () => {
-      if (typeof cleanup === 'function') {
-        cleanup();
-      }
-    };
+    return cleanup;
   }, []);
 
   return {

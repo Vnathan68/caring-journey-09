@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
@@ -43,11 +42,8 @@ const Signup: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Fix: pass the correct parameters to signUp function
-      const user = await signUp({
+      const user = await signUp(email, password, {
         name,
-        email,
-        password,
         role: 'patient' // Default role is patient
       });
       
@@ -57,7 +53,6 @@ const Signup: React.FC = () => {
         variant: "success"
       });
       
-      // Navigate based on role
       if (user.role === 'patient') {
         navigate('/dashboard/patient', { replace: true });
       } else {
