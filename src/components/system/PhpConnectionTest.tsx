@@ -37,6 +37,7 @@ const PhpConnectionTest = () => {
       toast({
         title: 'Connection Successful',
         description: 'The PHP backend is running correctly.',
+        variant: 'success'
       });
     } catch (error) {
       console.error('Connection failed:', error);

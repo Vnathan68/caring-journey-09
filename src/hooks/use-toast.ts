@@ -1,11 +1,12 @@
 
 import { toast as sonnerToast, type ToastT } from "sonner";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 
 type ToastProps = {
   title?: string;
   description?: string;
   variant?: "default" | "destructive" | "success" | "warning" | "info";
+  action?: ReactNode;
 };
 
 interface ToastState {
@@ -64,18 +65,24 @@ export const useToast = () => {
   const [state, setState] = useState<ToastState>({ toasts: [] });
 
   useEffect(() => {
-    // This is just to satisfy the type requirements
-    // Real toast functionality is handled by sonner directly
-    const unsubscribe = sonnerToast.onChange((toast) => {
+    // Create a mock onChange handler since sonnerToast.onChange might not be available
+    const handleToastChange = (toast: ToastT) => {
       if (toast.id) {
         setState(prev => ({
-          toasts: [...prev.toasts, toast as ToastT]
+          toasts: [...prev.toasts, toast]
         }));
       }
-    });
+    };
+    
+    // Use the listener API if it exists, otherwise we'll use our mock state
+    const cleanup = typeof sonnerToast.listen === 'function' 
+      ? sonnerToast.listen(handleToastChange) 
+      : () => {};
     
     return () => {
-      unsubscribe();
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
     };
   }, []);
 

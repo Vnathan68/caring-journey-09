@@ -16,7 +16,7 @@ const ApiTestPage = () => {
       </Helmet>
       
       <MainLayout>
-        <PageTransition>
+        <PageTransition className="w-full">
           <div className="container mx-auto py-10 px-4">
             <div className="max-w-4xl mx-auto space-y-8">
               <div>

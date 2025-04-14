@@ -43,11 +43,12 @@ const Signup: React.FC = () => {
     setIsSubmitting(true);
     
     try {
+      // Fix: pass the correct parameters to signUp function
       const user = await signUp({
         name,
         email,
         password,
-        // Default role is patient, set in auth-context
+        role: 'patient' // Default role is patient
       });
       
       toast({
