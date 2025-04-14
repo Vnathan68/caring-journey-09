@@ -1,95 +1,56 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
-import GlassCard from '@/components/ui-custom/glass-card';
-import PageTransition from '@/components/ui-custom/page-transition';
 import LoginForm from '@/components/auth/LoginForm';
 import TwoFactorForm from '@/components/auth/TwoFactorForm';
 import LoginHeader from '@/components/auth/LoginHeader';
 import LoginFooter from '@/components/auth/LoginFooter';
-import { ROLES } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
 
-const Login: React.FC = () => {
+const Login = () => {
   const [showTwoFactor, setShowTwoFactor] = useState(false);
-  const [twoFactorCode, setTwoFactorCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { verifyTwoFactorCode, needsTwoFactor } = useAuth();
-  const navigate = useNavigate();
-  
-  // Show two-factor form if needed based on context state
-  React.useEffect(() => {
-    if (needsTwoFactor) {
-      setShowTwoFactor(true);
-    }
-  }, [needsTwoFactor]);
+  const { isAuthenticated, user } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // If already authenticated, redirect to appropriate dashboard
+  if (isAuthenticated && user) {
+    let redirectPath = '/dashboard';
     
-    try {
-      if (showTwoFactor) {
-        const user = await verifyTwoFactorCode(twoFactorCode);
-        toast.success('Login successful');
-        
-        // Redirect based on user role after 2FA verification
-        if (user) {
-          redirectBasedOnRole(user.role);
-        }
-      } 
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Verification failed');
-    } finally {
-      setIsSubmitting(false);
+    switch (user.role) {
+      case 'admin':
+        redirectPath = '/dashboard/admin';
+        break;
+      case 'doctor':
+        redirectPath = '/dashboard';
+        break;
+      case 'secretary_nurse':
+        redirectPath = '/dashboard/secretary';
+        break;
+      case 'patient':
+        redirectPath = '/dashboard/patient';
+        break;
     }
-  };
-  
-  // Helper function to redirect based on user role
-  const redirectBasedOnRole = (role: string) => {
-    switch(role) {
-      case ROLES.ADMIN:
-        navigate('/dashboard/admin', { replace: true });
-        break;
-      case ROLES.DOCTOR:
-        navigate('/dashboard', { replace: true });
-        break;
-      case ROLES.PATIENT:
-        navigate('/dashboard/patient', { replace: true });
-        break;
-      case ROLES.SECRETARY_NURSE:
-        navigate('/dashboard/secretary', { replace: true });
-        break;
-      default:
-        navigate('/dashboard', { replace: true });
-    }
-  };
+    
+    return <Navigate to={redirectPath} replace />;
+  }
 
   return (
-    <PageTransition className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <LoginHeader />
-        
-        <GlassCard className="p-8">
-          {showTwoFactor ? (
-            <TwoFactorForm 
-              onBack={() => setShowTwoFactor(false)}
-              isSubmitting={isSubmitting}
-              onSubmit={handleSubmit}
-              twoFactorCode={twoFactorCode}
-              setTwoFactorCode={setTwoFactorCode}
-            />
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {!showTwoFactor ? (
+            <>
+              <LoginHeader />
+              <div className="mt-8">
+                <LoginForm onShowTwoFactor={() => setShowTwoFactor(true)} />
+              </div>
+              <LoginFooter />
+            </>
           ) : (
-            <LoginForm 
-              onShowTwoFactor={() => setShowTwoFactor(true)} 
-            />
+            <TwoFactorForm onCancel={() => setShowTwoFactor(false)} />
           )}
-          
-          <LoginFooter />
-        </GlassCard>
+        </div>
       </div>
-    </PageTransition>
+    </div>
   );
 };
 

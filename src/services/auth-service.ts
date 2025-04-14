@@ -1,89 +1,138 @@
 
-import { apiService } from './api-service';
-import { User } from '@/types/auth-types';
-import { AUTH_ENDPOINTS } from './api-config';
+import apiService from './api-service';
 
-/**
- * Response structure from the PHP backend
- */
-interface PhpResponse<T> {
-  status: string;
-  message?: string;
-  data?: T;
+export interface LoginCredentials {
+  email: string;
+  password: string;
 }
 
-/**
- * Service for authentication-related API calls to PHP backend
- */
-export const authService = {
-  /**
-   * Login user via PHP backend
-   * @param email - User email
-   * @param password - User password
-   * @returns Promise with user data
-   */
-  login: async (email: string, password: string): Promise<PhpResponse<User>> => {
-    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.LOGIN, { email, password });
-  },
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  twoFactorEnabled: boolean;
+}
 
-  /**
-   * Register new user via PHP backend
-   * @param userData - User registration data
-   * @returns Promise with created user
-   */
-  register: async (userData: {
-    email: string;
-    password: string;
-    name: string;
-    role?: string;
-  }): Promise<PhpResponse<User>> => {
-    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.REGISTER, userData);
-  },
+export interface LoginResponse {
+  status: string;
+  data?: User;
+  message?: string;
+  needsTwoFactor?: boolean;
+}
 
-  /**
-   * Verify two-factor authentication code
-   * @param code - 2FA code
-   * @returns Promise with user data
-   */
-  verifyTwoFactor: async (code: string): Promise<PhpResponse<User>> => {
-    return apiService.post<PhpResponse<User>>(AUTH_ENDPOINTS.VERIFY_2FA, { code });
-  },
+export interface TwoFactorVerifyResponse {
+  status: string;
+  data?: User;
+  message?: string;
+}
 
-  /**
-   * Request password reset
-   * @param email - User email
-   */
-  resetPassword: async (email: string): Promise<PhpResponse<void>> => {
-    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.RESET_PASSWORD, { email });
-  },
+class AuthService {
+  // In production, this would use the real API
+  async login(credentials: LoginCredentials): Promise<LoginResponse> {
+    // For development, let's use mock responses due to CORS issues
+    // In production, you'd uncomment this:
+    // return apiService.post<User>('/auth/login', credentials);
+    
+    console.log('Using mock auth service - login attempt for:', credentials.email);
+    
+    // Mock response based on credentials
+    const mockUsers = {
+      'admin@example.com': {
+        id: '1',
+        name: 'Admin User',
+        email: 'admin@example.com',
+        role: 'admin',
+        twoFactorEnabled: false,
+      },
+      'doctor@example.com': {
+        id: '2',
+        name: 'Dr. Maria Santos',
+        email: 'doctor@example.com',
+        role: 'doctor',
+        twoFactorEnabled: false,
+      },
+      'cashier@example.com': {
+        id: '3',
+        name: 'Reception Staff',
+        email: 'cashier@example.com',
+        role: 'secretary_nurse',
+        twoFactorEnabled: false,
+      },
+      'patient@example.com': {
+        id: '4',
+        name: 'Test Patient',
+        email: 'patient@example.com',
+        role: 'patient',
+        twoFactorEnabled: false,
+      },
+    };
 
-  /**
-   * Change user password
-   * @param currentPassword - Current password
-   * @param newPassword - New password
-   */
-  changePassword: async (currentPassword: string, newPassword: string): Promise<PhpResponse<void>> => {
-    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.CHANGE_PASSWORD, { currentPassword, newPassword });
-  },
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (credentials.password !== 'password123') {
+          reject(new Error('Invalid email or password'));
+          return;
+        }
 
-  /**
-   * Enable two-factor authentication
-   */
-  enableTwoFactor: async (): Promise<PhpResponse<void>> => {
-    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.ENABLE_2FA, {});
-  },
+        const user = mockUsers[credentials.email as keyof typeof mockUsers];
+        if (!user) {
+          reject(new Error('Invalid email or password'));
+          return;
+        }
 
-  /**
-   * Disable two-factor authentication
-   */
-  disableTwoFactor: async (): Promise<PhpResponse<void>> => {
-    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.DISABLE_2FA, {});
-  },
+        resolve({
+          status: 'success',
+          data: user,
+        });
+      }, 500); // Simulate network delay
+    });
+  }
 
-  /**
-   * Logout user
-   */
-  logout: async (): Promise<PhpResponse<void>> => {
-    return apiService.post<PhpResponse<void>>(AUTH_ENDPOINTS.LOGOUT, {});
-  },
-};
+  async logout(): Promise<{ status: string; message: string }> {
+    // For development, let's use a mock response
+    // In production, you'd use:
+    // return apiService.post('/auth/logout', {});
+    
+    console.log('Using mock auth service - logout');
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          status: 'success',
+          message: 'Logged out successfully',
+        });
+      }, 300);
+    });
+  }
+
+  async verifyTwoFactorCode(code: string): Promise<TwoFactorVerifyResponse> {
+    // For development, let's use a mock response
+    // In production, you'd use:
+    // return apiService.post('/auth/verify-2fa', { code });
+    
+    console.log('Using mock auth service - 2FA verify:', code);
+    
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (code === '123456') {
+          resolve({
+            status: 'success',
+            data: {
+              id: '1',
+              name: 'Admin User',
+              email: 'admin@example.com',
+              role: 'admin',
+              twoFactorEnabled: true,
+            },
+          });
+        } else {
+          reject(new Error('Invalid verification code'));
+        }
+      }, 500);
+    });
+  }
+}
+
+const authService = new AuthService();
+export default authService;

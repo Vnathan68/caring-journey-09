@@ -1,15 +1,14 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/auth-context';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
 import { Loader2, Mail, Key } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useAuthOperations } from '@/hooks/use-auth-operations';
 import {
   Form,
   FormControl,
@@ -18,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ROLES } from '@/lib/utils';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -34,8 +32,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, user } = useAuth();
-  const navigate = useNavigate();
+  const { login, isTwoFactorRequired } = useAuthOperations();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,34 +47,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onShowTwoFactor }) => {
     setIsSubmitting(true);
     
     try {
-      const user = await login(data.email, data.password);
-      toast.success('Login successful');
+      await login(data.email, data.password);
       
-      // Redirect to the appropriate dashboard based on user role
-      if (user) {
-        switch(user.role) {
-          case ROLES.ADMIN:
-            navigate('/dashboard/admin', { replace: true });
-            break;
-          case ROLES.DOCTOR:
-            navigate('/dashboard', { replace: true });
-            break;
-          case ROLES.PATIENT:
-            navigate('/dashboard/patient', { replace: true });
-            break;
-          case ROLES.SECRETARY_NURSE:
-            navigate('/dashboard/secretary', { replace: true });
-            break;
-          default:
-            navigate('/dashboard', { replace: true });
-        }
+      if (isTwoFactorRequired) {
+        onShowTwoFactor();
       }
     } catch (error) {
-      if (error instanceof Error && error.message === 'Two-factor authentication required') {
-        onShowTwoFactor();
-      } else {
-        toast.error(error instanceof Error ? error.message : 'Login failed');
-      }
+      // Error is handled in the useAuthOperations hook
+      console.error("Login form error:", error);
     } finally {
       setIsSubmitting(false);
     }

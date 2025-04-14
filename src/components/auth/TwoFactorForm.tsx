@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, Shield, Smartphone } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useAuth } from '@/contexts/auth-context';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import { ROLES } from '@/lib/utils';
 import {
   Form,
   FormControl,
@@ -26,107 +29,116 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface TwoFactorFormProps {
-  onBack: () => void;
-  isSubmitting: boolean;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  twoFactorCode: string;
-  setTwoFactorCode: (code: string) => void;
+  onCancel: () => void;
 }
 
-const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
-  onBack,
-  isSubmitting,
-  onSubmit,
-  twoFactorCode,
-  setTwoFactorCode
-}) => {
+const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { verifyTwoFactorCode } = useAuth();
+  const navigate = useNavigate();
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      twoFactorCode: twoFactorCode
+      twoFactorCode: '',
     },
   });
 
-  const handleSubmit = async (data: FormValues) => {
-    setTwoFactorCode(data.twoFactorCode);
+  const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
     
-    // We need to create a synthetic event to pass to the original onSubmit
-    const event = {
-      preventDefault: () => {},
-    } as React.FormEvent;
-    
-    await onSubmit(event);
+    try {
+      const user = await verifyTwoFactorCode(data.twoFactorCode);
+      toast.success('Two-factor verification successful');
+      
+      if (user) {
+        switch(user.role) {
+          case ROLES.ADMIN:
+            navigate('/dashboard/admin', { replace: true });
+            break;
+          case ROLES.DOCTOR:
+            navigate('/dashboard', { replace: true });
+            break;
+          case ROLES.PATIENT:
+            navigate('/dashboard/patient', { replace: true });
+            break;
+          case ROLES.SECRETARY_NURSE:
+            navigate('/dashboard/secretary', { replace: true });
+            break;
+          default:
+            navigate('/dashboard', { replace: true });
+        }
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Verification failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="text-center mb-4">
-          <Shield className="h-12 w-12 mx-auto text-clinic-600 mb-2" />
-          <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-          <p className="text-sm text-muted-foreground">
-            We've sent a 6-digit code to your registered device. 
-            Enter the code to continue.
-          </p>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="twoFactorCode"
-          render={({ field }) => (
-            <FormItem className="space-y-2">
-              <FormLabel>Verification Code</FormLabel>
-              <div className="relative">
-                <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-6">
+      <div className="text-center">
+        <Shield className="mx-auto h-12 w-12 text-blue-500 mb-4" />
+        <h2 className="text-2xl font-bold">Two-Factor Authentication</h2>
+        <p className="text-muted-foreground mt-2">
+          Enter the verification code from your authenticator app
+        </p>
+      </div>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="twoFactorCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Verification Code</FormLabel>
                 <FormControl>
                   <Input
-                    {...field}
-                    type="text"
                     placeholder="123456"
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                      field.onChange(value);
-                      setTwoFactorCode(value);
-                    }}
-                    className="h-12 pl-10 focus-visible:ring-clinic-500/30 focus-visible:border-clinic-500 text-center font-mono text-lg tracking-widest"
+                    className="text-center text-xl h-12 letter-spacing-wide font-mono"
+                    {...field}
+                    maxLength={6}
+                    autoComplete="one-time-code"
                   />
                 </FormControl>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex items-center justify-between text-sm">
-          <button 
-            type="button" 
-            className="text-clinic-600 hover:underline"
-            onClick={onBack}
-          >
-            Back to login
-          </button>
-          <button 
-            type="button" 
-            className="text-clinic-600 hover:underline"
-          >
-            Resend code
-          </button>
-        </div>
-
-        <Button 
-          type="submit" 
-          className="w-full h-12 bg-clinic-600 hover:bg-clinic-700 text-white"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Verifying...
-            </>
-          ) : 'Verify'}
-        </Button>
-      </form>
-    </Form>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              Back
+            </Button>
+            
+            <Button 
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : 'Verify'}
+            </Button>
+          </div>
+        </form>
+      </Form>
+      
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Use code <span className="font-mono bg-muted px-1 py-0.5 rounded">123456</span> for testing</p>
+      </div>
+    </div>
   );
 };
 

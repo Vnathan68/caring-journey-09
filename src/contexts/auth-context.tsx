@@ -1,53 +1,121 @@
 
-import React, { createContext, useContext } from 'react';
-import { AuthContextType } from '@/types/auth-types';
-import { useAuthOperations } from '@/hooks/use-auth-operations';
-import { usePersistentUser } from '@/hooks/use-persistent-user';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import authService, { User } from '@/services/auth-service';
+import { toast } from '@/hooks/use-toast';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const persistentUser = usePersistentUser();
-  const authOperations = useAuthOperations();
-  
-  // Use the persistent user
-  React.useEffect(() => {
-    if (persistentUser.user && !authOperations.user) {
-      authOperations.setUser(persistentUser.user);
-    }
-  }, [persistentUser.user]);
-  
-  // Update persistent user when auth user changes
-  React.useEffect(() => {
-    if (authOperations.user) {
-      persistentUser.setUser(authOperations.user);
-    } else if (authOperations.user === null) {
-      persistentUser.setUser(null);
-    }
-  }, [authOperations.user]);
-  
-  const value: AuthContextType = {
-    user: authOperations.user,
-    isAuthenticated: !!authOperations.user,
-    isLoading: authOperations.isLoading,
-    needsTwoFactor: authOperations.needsTwoFactor,
-    login: authOperations.login,
-    logout: authOperations.logout,
-    signUp: authOperations.signUp,
-    verifyTwoFactorCode: authOperations.verifyTwoFactorCode,
-    resetPassword: authOperations.resetPassword,
-    changePassword: authOperations.changePassword,
-    enableTwoFactor: authOperations.enableTwoFactor,
-    disableTwoFactor: authOperations.disableTwoFactor,
-  };
-  
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+export type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<User | null>;
+  logout: () => Promise<void>;
+  verifyTwoFactorCode: (code: string) => Promise<User | null>;
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  login: async () => null,
+  logout: async () => {},
+  verifyTwoFactorCode: async () => null,
+});
+
+export const useAuth = () => useContext(AuthContext);
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in on initial load
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('user');
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
+  const login = async (email: string, password: string): Promise<User | null> => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+
+      if (response.needsTwoFactor) {
+        throw new Error('Two-factor authentication required');
+      }
+
+      if (response.status === 'success' && response.data) {
+        setUser(response.data);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        return response.data;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await authService.logout();
+      setUser(null);
+      localStorage.removeItem('user');
+      toast.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to log out');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyTwoFactorCode = async (code: string): Promise<User | null> => {
+    setIsLoading(true);
+    try {
+      const response = await authService.verifyTwoFactorCode(code);
+      
+      if (response.status === 'success' && response.data) {
+        setUser(response.data);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        return response.data;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Two-factor verification error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        logout,
+        verifyTwoFactorCode,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
