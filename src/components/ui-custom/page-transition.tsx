@@ -7,7 +7,7 @@ interface PageTransitionProps {
   className?: string;
 }
 
-const PageTransition: React.FC<PageTransitionProps> = ({ children, className }: PageTransitionProps) => {
+const PageTransition = ({ children, className }: PageTransitionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   
   useEffect(() => {
