@@ -42,7 +42,7 @@ const Signup: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const user = await signUp(email, password, name, 'patient');
+      const user = await signUp(name, email, password);
       
       toast({
         title: "Success",
@@ -50,7 +50,7 @@ const Signup: React.FC = () => {
         variant: "success"
       });
       
-      if (user.role === 'patient') {
+      if (user?.role === 'patient') {
         navigate('/dashboard/patient', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
