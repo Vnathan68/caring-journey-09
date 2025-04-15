@@ -42,10 +42,7 @@ const Signup: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const user = await signUp(email, password, {
-        name,
-        role: 'patient' // Default role is patient
-      });
+      const user = await signUp(email, password, name, 'patient');
       
       toast({
         title: "Success",
