@@ -1,3 +1,4 @@
+
 <?php
 // CORS Headers - IMPORTANT: Match your React app's origin exactly
 header("Access-Control-Allow-Origin: http://localhost:8080");
@@ -8,6 +9,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 // Handle OPTIONS (preflight) requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Return 200 for preflight requests
     http_response_code(200);
     exit(0);
 }
