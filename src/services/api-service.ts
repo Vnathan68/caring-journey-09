@@ -8,6 +8,8 @@ interface ApiResponse<T> {
   status: string;
   data?: T;
   message?: string;
+  version?: string;
+  timestamp?: string;
 }
 
 class ApiService {
