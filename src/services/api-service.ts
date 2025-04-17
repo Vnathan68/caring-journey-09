@@ -36,6 +36,7 @@ class ApiService {
 
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     try {
+      console.log(`Fetching from URL: ${this.normalizeUrl(endpoint)}`);
       const response = await fetch(this.normalizeUrl(endpoint), {
         method: 'GET',
         headers: {
@@ -52,6 +53,7 @@ class ApiService {
 
   async post<T, D = any>(endpoint: string, data: D): Promise<ApiResponse<T>> {
     try {
+      console.log(`Posting to URL: ${this.normalizeUrl(endpoint)}`);
       const response = await fetch(this.normalizeUrl(endpoint), {
         method: 'POST',
         headers: {
