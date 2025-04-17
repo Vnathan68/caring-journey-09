@@ -1,4 +1,3 @@
-
 import apiService, { ApiResponse } from './api-service';
 
 export interface LoginCredentials {
@@ -44,7 +43,7 @@ class AuthService {
       
       return {
         status: response.status,
-        data: response.data?.data,
+        data: response.data,
         message: response.message,
         needsTwoFactor: false
       };
@@ -85,7 +84,7 @@ class AuthService {
       
       return {
         status: response.status,
-        data: response.data?.data,
+        data: response.data,
         message: response.message
       };
     } catch (error) {
@@ -139,6 +138,7 @@ class AuthService {
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
+        // For testing purposes, use 'password123' as the valid password for all mock users
         if (credentials.password !== 'password123') {
           reject(new Error('Invalid email or password'));
           return;

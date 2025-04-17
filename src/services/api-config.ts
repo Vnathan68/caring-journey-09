@@ -3,7 +3,7 @@
  * API configuration for connecting to PHP backend
  */
 
-// Base URL for PHP backend (modify this to match your local PHP server)
+// Base URL for PHP backend (ensure this matches your XAMPP setup)
 export const API_BASE_URL = 'http://localhost/santa-matilda-api';
 
 // Default headers for API requests
