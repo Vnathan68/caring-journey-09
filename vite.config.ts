@@ -21,8 +21,20 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: './dist', // Default output directory (adjust this to your XAMPP htdocs path for direct deployment)
+    outDir: './dist', // Default output directory
     emptyOutDir: true,
     sourcemap: mode === 'development',
-  }
+    // Configure assets to use relative paths instead of absolute paths
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        // Ensure assets use relative paths
+        assetFileNames: 'assets/[name].[hash][extname]',
+        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'assets/[name].[hash].js',
+      },
+    },
+  },
+  // Use relative paths for assets
+  base: './'
 }));

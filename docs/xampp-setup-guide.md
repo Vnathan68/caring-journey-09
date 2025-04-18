@@ -25,8 +25,8 @@ This document provides step-by-step instructions for integrating your React appl
 3. **Import Database Structure:**
    - Navigate to the created database
    - Click "Import" in the top menu
-   - Choose the `santa_matilda.sql` file from the project files (if available)
-   - If the SQL file is not available, manually create tables according to your application's needs
+   - Choose the `santa_matilda.sql` file from the PHP folder (`php/santa-matilda-api/config/santa_matilda.sql`)
+   - Click "Go" to import the database structure
 
 ## Step 2: Set Up PHP API Files
 
@@ -34,9 +34,18 @@ This document provides step-by-step instructions for integrating your React appl
    - Navigate to XAMPP installation directory (`C:\xampp` on Windows, `/Applications/XAMPP` on Mac, or `/opt/lampp` on Linux)
    - Go to the `htdocs` directory
    - Create a folder named `santa-matilda-api`
-   - Copy all PHP files from the `php/santa-matilda-api` folder in your project to this new folder
+   - Copy all PHP files from the `php/santa-matilda-api` folder in your project to this new folder:
+     ```
+     copy php/santa-matilda-api/* C:/xampp/htdocs/santa-matilda-api/
+     ```
+     (On Mac/Linux: `cp -r php/santa-matilda-api/* /Applications/XAMPP/htdocs/santa-matilda-api/`)
 
-2. **Configure Database Connection:**
+2. **Verify File Permissions:**
+   - Ensure PHP files have the correct permissions:
+     - Windows: Right-click folder → Properties → Security → Edit → Allow "Read & Execute" and "Read"
+     - Mac/Linux: `chmod -R 755 /path/to/htdocs/santa-matilda-api`
+
+3. **Configure Database Connection:**
    - Open `santa-matilda-api/config/database.php`
    - Verify database credentials match your XAMPP setup:
      ```php
@@ -46,40 +55,54 @@ This document provides step-by-step instructions for integrating your React appl
      private $password = ""; // Default XAMPP has no password
      ```
 
-3. **Test API Connection:**
+4. **Test API Connection:**
    - Open http://localhost/santa-matilda-api/ in your browser
    - You should see a welcome message or JSON response indicating the API is working
+   - If not, check Apache error logs in XAMPP control panel
 
-## Step 3: Configure React Application
+## Step 3: Enable Apache Modules and Configuration
 
-1. **Set API Base URL:**
-   - Ensure the API base URL in `src/services/api-service.ts` is correctly pointing to your XAMPP API:
-     ```javascript
-     const API_BASE_URL = 'http://localhost/santa-matilda-api';
+1. **Enable Required Apache Modules:**
+   - Open XAMPP Control Panel
+   - Click "Config" for Apache
+   - Select "httpd.conf"
+   - Ensure these modules are uncommented (no # at the start):
+     ```
+     LoadModule rewrite_module modules/mod_rewrite.so
+     LoadModule headers_module modules/mod_headers.so
+     ```
+   - Save the file and restart Apache
+
+2. **Configure Apache for CORS and PHP:**
+   - Make sure your `.htaccess` file is properly set up in the `santa-matilda-api` folder
+   - If you get CORS errors, verify that the Access-Control-Allow-Origin header is correctly set to your React app's URL
+
+## Step 4: Build and Deploy React Application
+
+1. **Configure React for Production Build:**
+   - Verify your `vite.config.ts` uses relative paths:
+     ```typescript
+     base: './',
+     build: {
+       outDir: './dist',
+       // Other build settings...
+     }
      ```
 
 2. **Build React Application:**
-   - Open terminal in your React project directory
-   - Run `npm run build` to create production build
-   - This will generate a `dist` directory with your built React app
+   - Run `npm run build` in your project directory
+   - This creates optimized files in the `dist` folder
 
 3. **Deploy to XAMPP:**
-   - Copy all contents from the `dist` directory to a new folder in XAMPP's `htdocs` directory (e.g., `htdocs/santa-matilda-app`)
-   - Alternatively, you can set up your vite.config.ts to build directly to the XAMPP htdocs directory:
-     ```typescript
-     export default defineConfig({
-       // Other config options...
-       build: {
-         outDir: 'C:/xampp/htdocs/santa-matilda-app', // Adjust path according to your XAMPP installation
-       },
-     });
+   - Create a folder for your app in htdocs (e.g., `santa-matilda-app`)
+   - Copy all contents from `dist` to this folder:
      ```
+     copy dist/* C:/xampp/htdocs/santa-matilda-app/
+     ```
+     (On Mac/Linux: `cp -r dist/* /Applications/XAMPP/htdocs/santa-matilda-app/`)
 
-## Step 4: Configure Apache for React Routing
-
-1. **Create .htaccess File:**
-   - Create a file named `.htaccess` in your React app's directory in htdocs
-   - Add the following content:
+4. **Set Up React Routing for Apache:**
+   - Create a `.htaccess` file in your React app folder with:
      ```
      <IfModule mod_rewrite.c>
        RewriteEngine On
@@ -90,60 +113,51 @@ This document provides step-by-step instructions for integrating your React appl
        RewriteRule . /santa-matilda-app/index.html [L]
      </IfModule>
      ```
-   - This enables React Router to handle client-side routing
 
-2. **Enable Apache mod_rewrite:**
-   - Open XAMPP Control Panel
-   - Click "Config" for Apache
-   - Select "httpd.conf"
-   - Find and uncomment the line: `LoadModule rewrite_module modules/mod_rewrite.so` (remove #)
-   - Save and restart Apache
+## Step 5: Troubleshooting Common Issues
 
-## Step 5: Testing the Integration
+### API Returns HTML Instead of JSON
+If you see "Unexpected token '<', '<!DOCTYPE...'" errors:
+1. Check your PHP files for HTML output before headers
+2. View the raw API response in browser dev tools to see what's being returned
+3. Ensure PHP errors are not being displayed (use error logging instead)
+4. Add `ini_set('display_errors', 0);` at the top of your PHP files
+
+### CORS Errors
+If you get CORS errors:
+1. Verify `.htaccess` in your API folder has correct CORS headers
+2. Check that Origin header exactly matches your app's URL (including http/https)
+3. Ensure mod_headers is enabled in Apache
+4. Check each PHP file has proper CORS headers before any output
+
+### API Not Found (404) Errors
+1. Check file paths and URL parameters
+2. Verify URL rewriting is working correctly
+3. Check Apache configuration and enable mod_rewrite
+
+### Database Connection Issues
+1. Check database credentials in config file
+2. Verify MySQL service is running
+3. Test database connection with a simple PHP script
+4. Check MySQL user permissions
+
+## Step 6: Testing Your Setup
 
 1. **Access Your React App:**
    - Open http://localhost/santa-matilda-app in your browser
-   - The React app should load and be able to communicate with the PHP API
+   - The app should load and function properly
 
 2. **Test Authentication:**
-   - Try logging in with test credentials:
-     - Email: admin@example.com
-     - Password: password123
-   - The app should connect to the PHP API, which validates against the MySQL database
+   - Use test credentials from the sample database:
+     - Admin: admin@example.com / password123
+     - Doctor: doctor@example.com / password123
+     - Patient: patient@example.com / password123
 
-3. **Troubleshooting Connection Issues:**
-   - Check browser console for CORS errors
-   - Verify API endpoints are correctly set up
-   - Confirm database connection is working
+3. **Debug Mode:**
+   - For development testing, enable console logs in your API service
+   - Check browser console for detailed error information
+   - Use browser network tab to inspect API requests and responses
 
-## Step 6: Setting Up for Production
+## Conclusion
 
-For production deployment:
-
-1. **Set up proper domain and HTTPS**
-2. **Update API URLs to production values**
-3. **Implement proper security measures**
-4. **Consider using environment variables for configuration**
-
-## Common Issues and Solutions
-
-### CORS Issues
-- Ensure proper CORS headers are set in both PHP API and Apache config
-- Check that credentials handling is consistent
-
-### Database Connection Errors
-- Verify MySQL service is running
-- Confirm database credentials are correct
-- Test connection with PHPMyAdmin
-
-### Routing Issues
-- Check .htaccess file configuration
-- Ensure mod_rewrite is enabled
-- Verify file paths in configuration
-
-### Authentication Problems
-- Test API endpoints directly using tools like Postman
-- Check PHP session configuration
-- Verify cookie handling is working correctly
-
-For additional support, refer to the project documentation or contact the development team.
+Your Santa Matilda Clinic application should now be fully integrated with XAMPP, with authentication and database operations working properly. If you encounter issues, review the troubleshooting section or consult the XAMPP documentation.

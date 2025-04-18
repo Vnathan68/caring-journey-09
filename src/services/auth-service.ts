@@ -1,4 +1,3 @@
-
 import apiService, { ApiResponse } from './api-service';
 
 export interface LoginCredentials {
@@ -44,7 +43,7 @@ class AuthService {
       
       return {
         status: response.status,
-        data: response.data as User,
+        data: response.data,
         message: response.message,
         needsTwoFactor: false
       };
@@ -85,7 +84,7 @@ class AuthService {
       
       return {
         status: response.status,
-        data: response.data as User,
+        data: response.data,
         message: response.message
       };
     } catch (error) {
